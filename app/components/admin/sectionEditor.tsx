@@ -42,7 +42,7 @@ function PhotoPicker({ label, value, photos, onChange, multiple = false }: { lab
         <button type="button" className="block text-xs text-amber-800 underline" onClick={() => setPreview({ src, label: `${label} ${index + 1}` })}>Perbesar</button>
         <div className="flex gap-2 text-xs"><button type="button" aria-label="Hapus foto" onClick={() => onChange(value.filter((_, i) => i !== index))}>Hapus</button>{multiple && index > 0 && <button type="button" aria-label="Geser foto ke kiri" onClick={() => { const next = [...value]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; onChange(next); }}>←</button>}</div>
       </div>)}
-      {!value.length && <p className="text-xs text-stone-500">Belum dipilih; memakai foto bawaan section.</p>}
+      {!value.length && <p className="text-xs text-stone-500">Belum dipilih; foto section tidak ditampilkan.</p>}
     </div>
     {open && <div className="space-y-3"><input aria-label={`Cari foto ${label}`} placeholder="Cari nama foto…" value={query} onChange={e => { setQuery(e.target.value); setLimit(30); }} className={input} />
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 max-h-80 overflow-y-auto">

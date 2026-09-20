@@ -43,7 +43,7 @@ export default function GallerySection({
   };
 
   const photos = gallery.filter(Boolean);
-  const featured = coverPhoto || photos[0];
+  const featured = coverPhoto || "";
 
   return (
     <section ref={gallerySection} className="relative z-10 px-6 py-10 sm:px-8">

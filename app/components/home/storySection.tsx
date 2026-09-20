@@ -9,11 +9,10 @@ import { getDriveThumbnailUrl } from "@/lib/gdrive";
 interface StorySectionProps {
   title?: string;
   story?: InvitationData["story"];
-  photos?: string[];
 }
 
 export default function StorySection({
-  title, story = [], photos = [] }: StorySectionProps) {
+  title, story = [] }: StorySectionProps) {
   if (!story || story.length === 0) return null;
 
   // Helper untuk mendapatkan URL gambar yang valid
@@ -47,7 +46,7 @@ export default function StorySection({
         {story.map((item, idx) => {
           const isEven = idx % 2 === 0;
 
-          const imgUrl = getImageUrl(item.image || photos[idx] || photos[0]);
+          const imgUrl = getImageUrl(item.image);
 
 
           return (

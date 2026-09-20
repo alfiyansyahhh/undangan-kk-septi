@@ -5,7 +5,6 @@ import DressCodeSection from "./components/home/dressCodeSection";
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
-import defaultData from "@/data/invitation-data.json";
 
 // Import semua Section yang sudah dipisah
 import CoverSection from "./components/home/converSection";
@@ -39,7 +38,8 @@ function InvitationContent() {
     return () => controller.abort();
   }, [guestToken]);
 
-  const [data, setData] = useState<InvitationData>(defaultData as InvitationData);
+  const [data, setData] = useState<InvitationData | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [copiedBank, setCopiedBank] = useState<string | null>(null);
   const [activeModalPhoto, setActiveModalPhoto] = useState<string | null>(null);
@@ -59,12 +59,14 @@ function InvitationContent() {
   useEffect(() => {
     async function loadData() {
       try {
-        const res = await fetch("/api/invitation");
+        const res = await fetch("/api/invitation", { cache: "no-store" });
+        if (!res.ok) throw new Error("Gagal membaca database");
         if (res.ok) {
           const json = await res.json();
           setData(json);
         }
       } catch (err) {
+        setLoadError(true);
         console.error("Gagal load invitation data:", err);
       }
     }
@@ -82,6 +84,7 @@ function InvitationContent() {
 
   // Countdown timer logic
   useEffect(() => {
+    if (!data) return;
     const target = new Date(data.events.targetDate).getTime();
 
     const interval = setInterval(() => {
@@ -102,7 +105,7 @@ function InvitationContent() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [data.events.targetDate]);
+  }, [data?.events.targetDate]);
 
   const handleOpenInvitation = () => {
     setIsOpen(true);
@@ -127,13 +130,13 @@ function InvitationContent() {
     setWishes(current => [saved, ...current.filter(w => w.id !== saved.id)]);
   };
 
-  useEffect(() => { document.title = data.couple.title; }, [data.couple.title]);
+  useEffect(() => { if (data) document.title = data.couple.title; }, [data?.couple.title]);
 
-  const coverUrl = getDriveThumbnailUrl(data.photos.cover || "1uwgIpksRY4BUmCPb1LtoNW3jtY2COuzI", 1200);
+  if (!data) return <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-black text-stone-300"><p role="status">{loadError ? "Undangan belum berhasil dimuat." : "Memuat undangan…"}</p>{loadError && <button onClick={() => window.location.reload()} className="rounded border border-white/30 px-4 py-2">Coba lagi</button>}</main>;
 
-  const slideshowPhotos = data.photos.coverSlides?.length
-    ? data.photos.coverSlides
-    : data.photos.gallery.length ? data.photos.gallery : [coverUrl];
+  const coverUrl = getDriveThumbnailUrl(data.photos.cover, 1200);
+
+  const slideshowPhotos = data.photos.coverSlides || [];
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative font-sans">
@@ -198,7 +201,7 @@ function InvitationContent() {
               id="quote-slider-section"
               quoteTitle={data.couple.quoteSource}
               quoteText={data.couple.quote}
-              gallery={data.photos.quoteSlides?.length ? data.photos.quoteSlides : data.photos.gallery}
+              gallery={data.photos.quoteSlides || []}
               onSelectPhoto={(url) => setActiveModalPhoto(url)}
             />
 
@@ -213,8 +216,8 @@ function InvitationContent() {
 
             {/* Event Section */}
             <EventSection 
-              photoAkad={data.photos.akad || data.photos.cover}
-              photoResepsi={data.photos.resepsi || data.photos.cover}
+              photoAkad={data.photos.akad}
+              photoResepsi={data.photos.resepsi}
               events={data.events} 
             />
 
@@ -227,7 +230,6 @@ function InvitationContent() {
             <StorySection 
               title={data.sections?.storyTitle}
               story={data.story} 
-              photos={data.photos.gallery}
             />
 
 
@@ -244,7 +246,7 @@ function InvitationContent() {
             {/* Wish / Ucapan Section */}
             <WishSection guestName={verifiedName} title={data.sections?.wishTitle} description={data.sections?.wishDescription} wishes={wishes} onSubmitWish={handleAddWish} />
 
-            <ClosingPhotoSection photo={data.photos.closing || data.photos.gallery.at(-1) || data.photos.cover} message={data.sections?.closingMessage} />
+            <ClosingPhotoSection photo={data.photos.closing} message={data.sections?.closingMessage} />
 
             {/* Footer Section */}
             <FooterSection
