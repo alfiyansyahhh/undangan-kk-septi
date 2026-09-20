@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import { useState } from "react";
 import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
 
@@ -37,16 +40,16 @@ export default function GallerySection({
   return (
     <section className="relative z-10 px-6 py-10 sm:px-8">
       <div className="mx-auto max-w-md space-y-6">
-        <div className="flex items-center gap-4 pb-3">
+        <motion.div {...revealMotion("title", 0)} className="flex items-center gap-4 pb-3">
           <h2 className="shrink-0 font-serif text-2xl sm:text-3xl text-white tracking-wide uppercase">
             Gallery
           </h2>
           <div aria-hidden="true" className="h-px flex-1 bg-white/80" />
-        </div>
+        </motion.div>
 
         {/* Show the supplied video, or use a gallery photo as the wide cover. */}
         {(videoUrl || photos.length > 0) && (
-          <div className="aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black/50 sm:rounded-2xl">
+          <motion.div {...revealMotion("zoom", 0.1)} className="aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black/50 sm:rounded-2xl">
             {videoUrl ? (
               <iframe
                 src={videoUrl}
@@ -72,13 +75,13 @@ export default function GallerySection({
                 />
               </button>
             )}
-          </div>
+          </motion.div>
         )}
 
         {photos.length > 0 && (
           <div className="grid grid-cols-3 gap-3 sm:gap-4">
             {photos.map((photoItem, idx) => (
-              <button
+              <motion.button {...revealMotion("zoom", 0.1)}
                 type="button"
                 key={`${photoItem}-${idx}`}
                 onClick={() => setActiveModalPhoto(getFullUrl(photoItem))}
@@ -92,7 +95,7 @@ export default function GallerySection({
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 motion-reduce:transition-none"
                   loading="lazy"
                 />
-              </button>
+              </motion.button>
             ))}
           </div>
         )}

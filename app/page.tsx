@@ -72,7 +72,25 @@ function InvitationContent() {
     try {
       const storedWishes = localStorage.getItem("wedding_wishes_meila_arif");
       if (storedWishes) {
-        setWishes(JSON.parse(storedWishes));
+        const stored: unknown = JSON.parse(storedWishes);
+        if (Array.isArray(stored)) {
+          const ids = new Set<string>();
+          const restored = stored.filter((item): item is Wish =>
+            item !== null && typeof item === "object" &&
+            typeof item.name === "string" && typeof item.message === "string" &&
+            typeof item.time === "string" &&
+            ["Hadir", "Tidak Hadir", "Ragu-ragu"].includes(item.attendance)
+          ).map((wish) => {
+            let id = wish.id;
+            if (typeof id !== "string" || !id.trim() || ids.has(id)) {
+              do { id = crypto.randomUUID(); } while (ids.has(id));
+            }
+            ids.add(id);
+            return { ...wish, id };
+          });
+          setWishes(restored);
+          localStorage.setItem("wedding_wishes_meila_arif", JSON.stringify(restored));
+        }
       }
     } catch {
       // ignore
@@ -118,7 +136,7 @@ function InvitationContent() {
 
   const handleAddWish = (wishData: Omit<Wish, "id" | "time">) => {
     const newWish: Wish = {
-      id: Date.now().toString(),
+      id: crypto.randomUUID(),
       ...wishData,
       time: "Baru saja",
     };

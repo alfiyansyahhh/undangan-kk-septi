@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 interface CountdownSectionProps {
   timeLeft: {
     days: number;
@@ -29,15 +32,15 @@ export default function CountdownSection({
       </p>
 
       {/* Title - Menggunakan font-serif standar */}
-      <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
+      <motion.h2 {...revealMotion("title", 0)} className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
         Menuju Hari Bahagia
-      </h2>
+      </motion.h2>
 
       {/* Divider tipis yang seragam */}
       <div className="w-16 h-[1px] bg-stone-400/50 mx-auto" />
 
       {/* Countdown Grid dengan gaya Frosted Glass & Font Seragam */}
-      <div className="grid grid-cols-4 gap-2 sm:gap-3 max-w-sm mx-auto pt-2">
+      <motion.div {...revealMotion("zoom", 0.1)} className="grid grid-cols-4 gap-2 sm:gap-3 max-w-sm mx-auto pt-2">
         {timeUnits.map((item, idx) => (
           <div
             key={idx}
@@ -51,12 +54,12 @@ export default function CountdownSection({
             </span>
           </div>
         ))}
-      </div>
+      </motion.div>
 
       {/* Display Date */}
-      <p className="text-xs sm:text-sm font-serif italic text-stone-300 pt-2 tracking-wide">
+      <motion.p {...revealMotion("text", 0.2)} className="text-xs sm:text-sm font-serif italic text-stone-300 pt-2 tracking-wide">
         {displayDate}
-      </p>
+      </motion.p>
     </section>
   );
 }

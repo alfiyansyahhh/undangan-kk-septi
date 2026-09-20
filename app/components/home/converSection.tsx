@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import { useState, useEffect } from "react";
 import { getDriveThumbnailUrl } from "@/lib/gdrive";
 
@@ -99,14 +102,14 @@ export default function CoverSection({
       {/* Content Container (Bagian Bawah) */}
       <div className="relative z-20 text-center px-6 pb-12 pt-20 space-y-5 max-w-md mx-auto w-full">
         {/* Subtitle */}
-        <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-stone-300 font-sans font-light">
+        <motion.p {...revealMotion("title", 0)} className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-stone-300 font-sans font-light">
           THE WEDDING OF
-        </p>
+        </motion.p>
 
         {/* Nama Mempelai */}
-        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-white tracking-widest uppercase font-medium">
+        <motion.h1 {...revealMotion("title", 0.1)} className="font-serif text-2xl sm:text-3xl md:text-4xl text-white tracking-widest uppercase font-medium">
           {groomShortName} &bull; {brideShortName}
-        </h1>
+        </motion.h1>
 
         {/* Tanggal */}
         <p className="text-[10px] sm:text-xs tracking-[0.25em] text-stone-300 uppercase font-sans">
@@ -114,17 +117,17 @@ export default function CoverSection({
         </p>
 
         {/* Area Tamu Undangan */}
-        <div className="pt-4 space-y-1">
+        <motion.div {...revealMotion("text", 0.2)} className="pt-4 space-y-1">
           <p className="text-[10px] sm:text-xs tracking-[0.2em] text-stone-400 uppercase font-sans">
             DEAR,
           </p>
           <h2 className="text-sm sm:text-base font-serif italic text-white tracking-wide">
             {guestName}
           </h2>
-        </div>
+        </motion.div>
 
         {/* Tombol LET'S ROLL */}
-        <div className="pt-3">
+        <motion.div {...revealMotion("text", 0.3)} className="pt-3">
           <button
             onClick={onOpen}
             className="px-6 py-2.5 rounded-full border border-white/40 bg-black/30 backdrop-blur-md text-white text-[10px] sm:text-xs tracking-[0.25em] font-sans uppercase hover:bg-white hover:text-black transition-all duration-300 flex items-center justify-center gap-2 mx-auto group shadow-lg cursor-pointer"
@@ -142,9 +145,9 @@ export default function CoverSection({
                 d="M19 13l-7 7-7-7m14-8l-7 7-7-7"
               />
             </svg>
-            <span>LET'S ROLL</span>
+            <span>LET&apos;S ROLL</span>
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

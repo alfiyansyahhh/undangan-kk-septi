@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
 
 interface EventSectionProps {
@@ -24,7 +27,7 @@ export default function EventSection({
   return (
     <section className="px-6 py-12 space-y-8 text-white relative z-10">
       {/* Header Title */}
-      <div className="text-center space-y-2">
+      <motion.div {...revealMotion("title", 0)} className="text-center space-y-2">
         <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-stone-300 font-sans font-light">
           RANGKAIAN ACARA
         </p>
@@ -32,11 +35,11 @@ export default function EventSection({
           Wedding &bull; Event
         </h2>
         <div className="w-16 h-[1px] bg-stone-400/50 mx-auto" />
-      </div>
+      </motion.div>
 
       <div className="space-y-5 max-w-md mx-auto">
         {/* CARD 1: Akad / Pawiwahan */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-stretch gap-4 shadow-xl">
+        <motion.div {...revealMotion("left", 0.1)} className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-stretch gap-4 shadow-xl">
           {/* Foto Kiri */}
           {akadImg && (
             <div className="w-2/5 flex-shrink-0 rounded-xl overflow-hidden relative min-h-[140px]">
@@ -87,10 +90,10 @@ export default function EventSection({
               </a>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* CARD 2: Resepsi */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-stretch gap-4 shadow-xl">
+        <motion.div {...revealMotion("right", 0.2)} className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-stretch gap-4 shadow-xl">
           {/* Foto Kiri */}
           {resepsiImg && (
             <div className="w-2/5 flex-shrink-0 rounded-xl overflow-hidden relative min-h-[140px]">
@@ -141,7 +144,7 @@ export default function EventSection({
               </a>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

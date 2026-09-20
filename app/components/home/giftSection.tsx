@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import { useState } from "react";
 import { InvitationData } from "@/lib/gdrive";
 
@@ -33,15 +36,15 @@ export default function GiftSection({
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
 
       <div className="relative z-10 w-full p-8 pb-12 space-y-5">
-        <h2 className="font-serif text-2xl sm:text-3xl tracking-wide text-white text-center">
+        <motion.h2 {...revealMotion("fade", 0)} className="font-serif text-2xl sm:text-3xl tracking-wide text-white text-center">
           Wedding Gift
-        </h2>
+        </motion.h2>
         <div className="gold-divider w-24 mx-auto" />
-        <p className="text-sm text-stone-300 text-center leading-relaxed max-w-sm mx-auto font-sans">
+        <motion.p {...revealMotion("text", 0.1)} className="text-sm text-stone-300 text-center leading-relaxed max-w-sm mx-auto font-sans">
           Tanpa mengurangi rasa hormat kami bagi tamu yang ingin mengirimkan hadiah kepada kedua mempelai, silahkan klik dibawah ini :
-        </p>
+        </motion.p>
 
-        <div className="flex items-center gap-3 max-w-sm mx-auto pt-2">
+        <motion.div {...revealMotion("text", 0.2)} className="flex items-center gap-3 max-w-sm mx-auto pt-2">
           <div className="flex-1 relative">
             <select
               value={selectedGiftIdx}
@@ -65,16 +68,16 @@ export default function GiftSection({
           >
             {copiedBank === currentGift.bank ? "✓ COPIED" : "COPY"}
           </button>
-        </div>
+        </motion.div>
 
-        <div className="text-center">
+        <motion.div {...revealMotion("text", 0.3)} className="text-center">
           <p className="text-lg font-sans tabular-nums text-[#c9a96e] tracking-widest">
             {currentGift.number}
           </p>
           <p className="text-xs text-stone-400 mt-1">
             a.n. {currentGift.holder}
           </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

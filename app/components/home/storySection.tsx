@@ -1,5 +1,7 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+
 import { motion } from "framer-motion";
 import { InvitationData } from "@/lib/gdrive";
 import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
@@ -28,7 +30,7 @@ export default function StorySection({ story = [], photos = [] }: StorySectionPr
   return (
     <section className="px-6 py-12 text-white space-y-8 relative z-10 overflow-hidden">
       {/* Header Title */}
-      <div className="text-center space-y-3">
+      <motion.div {...revealMotion("title", 0)} className="text-center space-y-3">
         <div className="flex items-center justify-center gap-4">
           <div className="h-[1px] w-12 bg-stone-400/50" />
           <h2 className="font-serif text-2xl sm:text-3xl tracking-widest text-white uppercase">
@@ -36,7 +38,7 @@ export default function StorySection({ story = [], photos = [] }: StorySectionPr
           </h2>
           <div className="h-[1px] w-12 bg-stone-400/50" />
         </div>
-      </div>
+      </motion.div>
 
       {/* Journey Cards Container */}
       <div className="space-y-6 max-w-md mx-auto">

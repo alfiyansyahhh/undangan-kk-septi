@@ -1,3 +1,8 @@
+"use client";
+
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import Link from "next/link";
 
 interface FooterSectionProps {
@@ -14,16 +19,16 @@ export default function FooterSection({
   return (
     <>
       <footer className="pt-10 pb-16 px-6 text-center space-y-4 border-t border-white/5 mt-10">
-        <p className="text-xs text-stone-500 leading-relaxed max-w-sm mx-auto">
+        <motion.p {...revealMotion("fade", 0)} className="text-xs text-stone-500 leading-relaxed max-w-sm mx-auto">
           Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
-        </p>
+        </motion.p>
         <div className="gold-divider w-16 mx-auto" />
-        <p className="font-serif text-2xl sm:text-3xl tracking-wide text-white">
+        <motion.p {...revealMotion("fade", 0.1)} className="font-serif text-2xl sm:text-3xl tracking-wide text-white">
           {brideShortName} & {groomShortName}
-        </p>
-        <p className="text-xs text-[#c9a96e] font-medium tracking-wider">
+        </motion.p>
+        <motion.p {...revealMotion("text", 0.2)} className="text-xs text-[#c9a96e] font-medium tracking-wider">
           {hashtag}
-        </p>
+        </motion.p>
       </footer>
 
       {/* Floating Admin Button */}

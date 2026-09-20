@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import { useState } from "react";
 
 export interface Wish {
@@ -33,7 +36,7 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
   return (
     <section className="relative px-6 py-14 font-sans sm:px-8">
       <div className="mx-auto max-w-md space-y-8">
-      <div className="text-center space-y-4">
+      <motion.div {...revealMotion("title", 0)} className="text-center space-y-4">
         <p className="text-[10px] font-sans font-light uppercase tracking-[0.4em] text-[#c9a96e]">
           Buku Tamu
         </p>
@@ -42,9 +45,9 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
         <p className="mx-auto max-w-[260px] text-xs leading-6 text-stone-300">
           Kirimkan doa dan ucapan terbaik untuk kedua mempelai
         </p>
-      </div>
+      </motion.div>
 
-      <form
+      <motion.form {...revealMotion("fade", 0.1)}
         onSubmit={handleSubmit}
         className="relative space-y-6 rounded-2xl border border-[#c9a96e]/20 bg-gradient-to-b from-[#1c1914]/95 to-[#101010]/95 p-6 shadow-xl sm:p-7"
       >
@@ -96,7 +99,7 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
         >
           Kirim Ucapan & Doa
         </button>
-      </form>
+      </motion.form>
 
       <div className="space-y-5">
         <div className="flex items-center gap-3">
@@ -109,8 +112,8 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
           <p className="py-6 text-center text-xs leading-6 text-stone-400">Jadilah yang pertama mengirimkan doa dan harapan.</p>
         )}
         {wishes.map((w) => (
-          <div key={w.id} className="space-y-3 rounded-xl border border-[#c9a96e]/20 bg-black/70 p-5 shadow-lg backdrop-blur-xl">
-            <div className="flex items-start justify-between gap-3">
+          <motion.div {...revealMotion("text", 0)} key={w.id} className="space-y-3 rounded-xl border border-[#c9a96e]/20 bg-black/70 p-5 shadow-lg backdrop-blur-xl">
+            <div key="author" className="flex items-start justify-between gap-3">
               <span className="min-w-0 break-words font-serif text-lg font-normal tracking-wide text-[#eee5d5]">{w.name}</span>
               <span
                 className={`shrink-0 text-[9px] px-2 py-1 rounded-full font-normal tracking-wide ${
@@ -124,9 +127,9 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
                 {w.attendance}
               </span>
             </div>
-            <p className="whitespace-pre-wrap break-words text-xs text-stone-200 leading-6">{w.message}</p>
-            <span className="text-[10px] text-stone-400 block pt-1">{w.time}</span>
-          </div>
+            <p key="message" className="whitespace-pre-wrap break-words text-xs text-stone-200 leading-6">{w.message}</p>
+            <span key="time" className="text-[10px] text-stone-400 block pt-1">{w.time}</span>
+          </motion.div>
         ))}
         </div>
       </div>

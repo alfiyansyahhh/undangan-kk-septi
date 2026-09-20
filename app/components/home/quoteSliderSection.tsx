@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
@@ -28,7 +31,7 @@ export default function QuoteSliderSection({
   return (
     <section id={id} className="py-16 px-6 bg-[#0a0a0a] border-t border-white/5 space-y-8 overflow-hidden">
       {/* Kutipan / Ayat Header */}
-      <div className="max-w-xl mx-auto space-y-6">
+      <motion.div {...revealMotion("fade", 0)} className="max-w-xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
           <h2 className="font-serif italic text-lg sm:text-2xl text-white font-medium whitespace-nowrap">
             {quoteTitle}
@@ -39,10 +42,10 @@ export default function QuoteSliderSection({
         <p className="text-[11px] sm:text-sm text-stone-300 leading-relaxed font-light font-serif tracking-wide text-justify sm:text-left">
           {quoteText}
         </p>
-      </div>
+      </motion.div>
 
       {/* Infinite Auto-Scroll Slider */}
-      <div className="w-full relative py-4">
+      <motion.div {...revealMotion("text", 0.1)} className="w-full relative py-4">
         {/* Gradient Blur Overlay Kiri & Kanan */}
         <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#0a0a0a] to-transparent z-10 pointer-events-none" />
@@ -88,7 +91,7 @@ export default function QuoteSliderSection({
             );
           })}
         </Swiper>
-      </div>
+      </motion.div>
     </section>
   );
 }

@@ -1,5 +1,8 @@
 "use client";
 
+import { revealMotion } from "./revealMotion";
+import { motion } from "framer-motion";
+
 interface HeroSectionProps {
   brideShortName: string;
   groomShortName: string;
@@ -15,17 +18,17 @@ export default function HeroSection({
     <section className="relative w-full h-screen min-h-[600px] flex flex-col justify-end text-white bg-transparent">
       {/* Hero Typography Content */}
       <div className="relative z-10 text-center px-6 pb-16 pt-20 space-y-4 max-w-md mx-auto w-full">
-        <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-stone-300 font-sans font-light">
+        <motion.p {...revealMotion("fade", 0)} className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-stone-300 font-sans font-light">
           THE WEDDING OF
-        </p>
+        </motion.p>
 
-        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-white tracking-widest uppercase font-medium">
+        <motion.h1 {...revealMotion("zoom", 0.1)} className="font-serif text-2xl sm:text-3xl md:text-4xl text-white tracking-widest uppercase font-medium">
           {groomShortName} &bull; {brideShortName}
-        </h1>
+        </motion.h1>
 
-        <p className="text-[10px] sm:text-xs tracking-[0.25em] text-stone-300 uppercase font-sans">
+        <motion.p {...revealMotion("text", 0.2)} className="text-[10px] sm:text-xs tracking-[0.25em] text-stone-300 uppercase font-sans">
           {displayDate}
-        </p>
+        </motion.p>
 
         {/* Scroll Indicator Icon */}
         <div className="pt-8 animate-bounce opacity-70">
