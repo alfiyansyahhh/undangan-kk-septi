@@ -1,4 +1,5 @@
 "use client";
+import PhotoLightbox from "./components/home/photoLightbox";
 import ClosingPhotoSection from "./components/home/closingPhotoSection";
 import DressCodeSection from "./components/home/dressCodeSection";
 
@@ -260,20 +261,7 @@ function InvitationContent() {
         </div>
       </div>
 
-      {/* Modal Lightbox Foto (Opsional jika foto di-click) */}
-      {activeModalPhoto && (
-        <div
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 cursor-pointer"
-          onClick={() => setActiveModalPhoto(null)}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={activeModalPhoto}
-            alt="Expanded view"
-            className="max-w-full max-h-[90vh] object-contain rounded-sm"
-          />
-        </div>
-      )}
+      {activeModalPhoto && <PhotoLightbox src={activeModalPhoto} onClose={() => setActiveModalPhoto(null)} />}
     </div>
   );
 }

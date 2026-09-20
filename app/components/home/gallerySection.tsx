@@ -1,4 +1,5 @@
 "use client";
+import PhotoLightbox from "./photoLightbox";
 
 import { revealMotion } from "./revealMotion";
 import { motion } from "framer-motion";
@@ -121,28 +122,7 @@ export default function GallerySection({
         )}
       </div>
 
-      {/* Modal Lightbox Preview */}
-      {activeModalPhoto && (
-        <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-          onClick={() => setActiveModalPhoto(null)}
-        >
-          <div className="relative max-w-3xl w-full max-h-[90vh] flex flex-col items-center">
-            <button
-              onClick={() => setActiveModalPhoto(null)}
-              className="absolute -top-10 right-0 text-white text-xs bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-full transition font-sans"
-            >
-              ✕ Tutup
-            </button>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={activeModalPhoto}
-              alt="Zoomed preview"
-              className="max-h-[85vh] max-w-full rounded-xl object-contain shadow-2xl"
-            />
-          </div>
-        </div>
-      )}
+      {activeModalPhoto && <PhotoLightbox src={activeModalPhoto} onClose={() => setActiveModalPhoto(null)} />}
     </section>
   );
 }
