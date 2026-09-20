@@ -1,69 +1,252 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
+import defaultData from "@/data/invitation-data.json";
+
+// Import semua Section yang sudah dipisah
+import CoverSection from "./components/home/converSection";
+import HeroSection from "./components/home/heroSection";
+import BrideSection from "./components/home/brideSection";
+import GroomSection from "./components/home/groomSection";
+import CountdownSection from "./components/home/countDownSection";
+import EventSection from "./components/home/eventSection";
+import GallerySection from "./components/home/gallerySection";
+import StorySection from "./components/home/storySection";
+import GiftSection from "./components/home/giftSection";
+import WishSection, { Wish } from "./components/home/wishSection";
+import FooterSection from "./components/home/footerSection";
+
+function InvitationContent() {
+  const searchParams = useSearchParams();
+  const guestName = searchParams.get("to") || searchParams.get("u") || "Tamu Undangan";
+
+  const [data, setData] = useState<InvitationData>(defaultData as InvitationData);
+  const [isOpen, setIsOpen] = useState(false);
+  const [copiedBank, setCopiedBank] = useState<string | null>(null);
+
+  // Wishes State
+  const [wishes, setWishes] = useState<Wish[]>([
+    {
+      id: "1",
+      name: "Rian & Sarah",
+      attendance: "Hadir",
+      message: "Selamat! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah. Bahagia selalu sampai kakek nenek.",
+      time: "1 jam yang lalu",
+    },
+    {
+      id: "2",
+      name: "Dinda Lestari",
+      attendance: "Hadir",
+      message: "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fii khair. Lancar sampai hari H yaa!",
+      time: "3 jam yang lalu",
+    },
+  ]);
+
+  // Countdown State
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  // Fetch updated data from local API
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const res = await fetch("/api/invitation");
+        if (res.ok) {
+          const json = await res.json();
+          setData(json);
+        }
+      } catch (err) {
+        console.error("Gagal load invitation data:", err);
+      }
+    }
+    loadData();
+
+    try {
+      const storedWishes = localStorage.getItem("wedding_wishes_meila_arif");
+      if (storedWishes) {
+        setWishes(JSON.parse(storedWishes));
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Countdown timer logic
+  useEffect(() => {
+    const target = new Date(data.events.targetDate).getTime();
+
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = target - now;
+
+      if (distance < 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        clearInterval(interval);
+      } else {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000),
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [data.events.targetDate]);
+
+  const handleOpenInvitation = () => {
+    setIsOpen(true);
+    setTimeout(() => {
+      document.getElementById("main-invitation")?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
+  const handleCopyAccount = (number: string, bank: string) => {
+    navigator.clipboard.writeText(number);
+    setCopiedBank(bank);
+    setTimeout(() => setCopiedBank(null), 2500);
+  };
+
+  const handleAddWish = (wishData: Omit<Wish, "id" | "time">) => {
+    const newWish: Wish = {
+      id: Date.now().toString(),
+      ...wishData,
+      time: "Baru saja",
+    };
+
+    const updated = [newWish, ...wishes];
+    setWishes(updated);
+    try {
+      localStorage.setItem("wedding_wishes_meila_arif", JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  const coverUrl = data.photos.cover || getDriveThumbnailUrl("1uwgIpksRY4BUmCPb1LtoNW3jtY2COuzI", 1200);
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-white relative">
+      {/* 1. COVER SCREEN */}
+      <CoverSection
+        isOpen={isOpen}
+        coverUrl={coverUrl}
+        brideShortName={data.couple.bride.shortName}
+        groomShortName={data.couple.groom.shortName}
+        displayDate={data.events.displayDate}
+        guestName={guestName}
+        onOpen={handleOpenInvitation}
+      />
+
+      {/* 2. MAIN CONTENT */}
+      <div id="main-invitation" className="min-h-screen bg-[#0a0a0a] relative">
+        {/* Container Flex / Grid Split Screen di Desktop */}
+        <div className="flex flex-col lg:flex-row min-h-screen">
+          
+          {/* ======================================================== */}
+          {/* PANEL KIRI (Desktop): Fixed / Sticky Hero Cover Photo     */}
+          {/* ======================================================== */}
+          <div className="hidden lg:block lg:w-7/12 xl:w-2/3 h-screen sticky top-0 overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={coverUrl}
+              alt="Desktop Cover"
+              className="w-full h-full object-cover object-center animate-slow-zoom"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+            
+            {/* Content overlay opsional di panel kiri desktop */}
+            <div className="absolute bottom-12 left-12 right-12 text-white space-y-3 z-10">
+              <p className="text-xs uppercase tracking-[0.35em] text-[#c9a96e]">
+                The Wedding Of
+              </p>
+              <h1 className="font-display text-5xl xl:text-6xl text-white leading-tight">
+                {data.couple.bride.shortName} & {data.couple.groom.shortName}
+              </h1>
+              <p className="text-sm tracking-widest text-stone-300 font-light">
+                {data.events.displayDate}
+              </p>
+            </div>
+          </div>
+
+          {/* ======================================================== */}
+          {/* PANEL KANAN: Content Sections (Mobile & Desktop Scroll)  */}
+          {/* ======================================================== */}
+          <div className="w-full lg:w-5/12 xl:w-1/3 min-h-screen bg-[#0a0a0a] pb-24 border-l border-white/10 shadow-2xl">
+            
+            {/* Hero section tetep muncul di mobile, tapi bisa disembunyikan di desktop kalau mau */}
+            {/* <div className="lg:hidden"> */}
+              <HeroSection
+                coverUrl={coverUrl}
+                brideShortName={data.couple.bride.shortName}
+                groomShortName={data.couple.groom.shortName}
+                quote={data.couple.quote}
+                quoteSource={data.couple.quoteSource}
+                displayDate={data.events.displayDate}
+              />
+            {/* </div> */}
+
+            {/* Rangkaian Section Utama */}
+            <BrideSection
+              photo={data.couple.bride.photo}
+              fullName={data.couple.bride.fullName}
+              fatherName={data.couple.bride.fatherName}
+              motherName={data.couple.bride.motherName}
+              instagram={data.couple.bride.instagram}
+            />
+
+            <GroomSection
+              photo={data.couple.groom.photo}
+              fullName={data.couple.groom.fullName}
+              fatherName={data.couple.groom.fatherName}
+              motherName={data.couple.groom.motherName}
+              instagram={data.couple.groom.instagram}
+            />
+
+            <CountdownSection
+              timeLeft={timeLeft}
+              displayDate={data.events.displayDate}
+            />
+
+            <EventSection events={data.events} />
+
+            <GallerySection gallery={data.photos.gallery} />
+
+            <StorySection story={data.story} />
+
+            <GiftSection
+              gifts={data.gifts}
+              coverUrl={coverUrl}
+              onCopy={handleCopyAccount}
+              copiedBank={copiedBank}
+            />
+
+            <WishSection wishes={wishes} onSubmitWish={handleAddWish} />
+
+            <FooterSection
+              brideShortName={data.couple.bride.shortName}
+              groomShortName={data.couple.groom.shortName}
+              hashtag={data.couple.hashtag}
+            />
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[#0a0a0a] text-white font-serif-elegant">Memuat undangan...</div>}>
+      <InvitationContent />
+    </Suspense>
   );
 }

@@ -1,0 +1,90 @@
+{
+  "couple": {
+    "title": "The Wedding of Meila & Arif",
+    "hashtag": "#MeilaArifSelamanya",
+    "quote": "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.",
+    "quoteSource": "QS. Ar-Rum: 21",
+    "bride": {
+      "shortName": "Meila",
+      "fullName": "Meila Anggraini, S.Kom",
+      "fatherName": "Bpk. Bambang Sutrisno",
+      "motherName": "Ibu Sri Wahyuni",
+      "instagram": "@meilaanggraini",
+      "photo": "https://drive.google.com/thumbnail?id=1vQ8lhGQrKxnYcHuCahtLN2ZeblyyCnvs&sz=w800",
+      "photoId": "1vQ8lhGQrKxnYcHuCahtLN2ZeblyyCnvs"
+    },
+    "groom": {
+      "shortName": "Arif",
+      "fullName": "Muhammad Arif Hidayat, S.T",
+      "fatherName": "Bpk. H. Suryanto",
+      "motherName": "Ibu Hj. Siti Nurhaliza",
+      "instagram": "@arif_hidayat",
+      "photo": "https://drive.google.com/thumbnail?id=1JVfp2Iiik1HRXHC1T3NL73Frtr-HROO-&sz=w800",
+      "photoId": "1JVfp2Iiik1HRXHC1T3NL73Frtr-HROO-"
+    }
+  },
+  "photos": {
+    "cover": "https://drive.google.com/thumbnail?id=1E21573x2_mLdfiG_F0NlDU4e-JwqC0QW&sz=w800",
+    "coverId": "1E21573x2_mLdfiG_F0NlDU4e-JwqC0QW",
+    "gallery": [
+      "1uwgIpksRY4BUmCPb1LtoNW3jtY2COuzI",
+      "16YrbN2alAbsG68Z8fUXqGVm9GtFk0q9k",
+      "1JVfp2Iiik1HRXHC1T3NL73Frtr-HROO-",
+      "1XdSgQgtrouPUUm-0uB2GnhFqNatXokF5",
+      "1vQ8lhGQrKxnYcHuCahtLN2ZeblyyCnvs",
+      "1b03ZDu7S5TdtvXU0Pc8zM-Gx-T4deMC4",
+      "1Ccj3XxK07DN3SVgq8Cn8MH3f8tapjEEF",
+      "1JHjePLBQw_3ZJ_PCJYczLy1zmUypT5Wf",
+      "1E21573x2_mLdfiG_F0NlDU4e-JwqC0QW"
+    ]
+  },
+  "events": {
+    "targetDate": "2026-08-18T08:00:00",
+    "displayDate": "Selasa, 18 Agustus 2026",
+    "akad": {
+      "title": "Akad Nikah",
+      "date": "Selasa, 18 Agustus 2026",
+      "time": "08:00 - 10:00 WIB",
+      "venue": "Masjid Raya",
+      "address": "Jl. Veteran No. 45, Komplek Perkantoran",
+      "mapsUrl": "https://maps.google.com"
+    },
+    "resepsi": {
+      "title": "Resepsi Pernikahan",
+      "date": "Selasa, 18 Agustus 2026",
+      "time": "11:00 - 14:00 WIB",
+      "venue": "Grand Ballroom Gedung Pernikahan",
+      "address": "Jl. Sudirman No. 88, Gedung Serbaguna",
+      "mapsUrl": "https://maps.google.com"
+    }
+  },
+  "story": [
+    {
+      "year": "2021",
+      "title": "Awal Berkenalan",
+      "desc": "Pertama kali bertemu saat mengikuti proyek kolaborasi di kampus."
+    },
+    {
+      "year": "2023",
+      "title": "Menjalin Komitmen",
+      "desc": "Memutuskan untuk melangkah bersama dengan komitmen yang lebih serius."
+    },
+    {
+      "year": "2026",
+      "title": "Hari Bahagia",
+      "desc": "Mengikat janji suci pernikahan untuk bersama membangun keluarga yang sakinah."
+    }
+  ],
+  "gifts": [
+    {
+      "bank": "BCA",
+      "number": "8801234567",
+      "holder": "Meila Anggraini"
+    },
+    {
+      "bank": "Bank Mandiri",
+      "number": "1370009876543",
+      "holder": "Muhammad Arif Hidayat"
+    }
+  ]
+}

@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #0a0a0a;
+  --foreground: #f5f0e8;
+  --gold: #c9a96e;
+  --gold-light: #ddc08a;
+  --gold-dark: #a88a4e;
+  --dark-card: #141414;
+  --dark-surface: #1a1a1a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+  overflow-x: hidden;
+}
+
+/* Cinzel Decorative for display headings */
+.font-display {
+  font-family: var(--font-cinzel), "Cinzel Decorative", "Cinzel", serif;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+}
+
+/* Serif elegant — Cormorant Garamond */
+.font-serif-elegant {
+  font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
+}
+
+/* Fade in animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slowZoom {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animate-slow-zoom {
+  animation: slowZoom 20s ease-in-out alternate infinite;
+}
+
+/* Custom scrollbar — dark theme */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Gold divider line */
+.gold-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+/* Gallery masonry helper */
+.gallery-masonry {
+  column-count: 3;
+  column-gap: 4px;
+}
+
+.gallery-masonry > div {
+  break-inside: avoid;
+  margin-bottom: 4px;
 }
