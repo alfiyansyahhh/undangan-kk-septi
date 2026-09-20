@@ -94,3 +94,8 @@ body {
   break-inside: avoid;
   margin-bottom: 4px;
 }
+
+/* Smooth continuous scroll for Swiper marquee */
+.swiper-wrapper {
+  transition-timing-function: linear !important;
+}

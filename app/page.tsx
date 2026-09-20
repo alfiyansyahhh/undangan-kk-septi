@@ -17,6 +17,7 @@ import StorySection from "./components/home/storySection";
 import GiftSection from "./components/home/giftSection";
 import WishSection, { Wish } from "./components/home/wishSection";
 import FooterSection from "./components/home/footerSection";
+import QuoteSliderSection from "./components/home/quoteSliderSection";
 
 function InvitationContent() {
   const searchParams = useSearchParams();
@@ -203,14 +204,25 @@ function InvitationContent() {
               instagram={data.couple.groom.instagram}
             />
 
+         <QuoteSliderSection
+              quoteTitle="Rgveda X.85.36"
+              quoteText="Dalam sebuah pernikahan kalian disatukan demi sebuah kebahagiaan dengan janji hati untuk saling membahagiakan. Bersamaku engkau akan hidup selamanya karena Tuhan pasti akan memberikan karunia sebagai pelindung dan saksi dalam pernikahan ini. Untuk itulah kalian dipersatukan dalam satu keluarga."
+              gallery={data.photos.gallery}
+            />
+            
+
             <CountdownSection
               timeLeft={timeLeft}
               displayDate={data.events.displayDate}
             />
 
             <EventSection events={data.events} />
-
+  
+   
             <GallerySection gallery={data.photos.gallery} />
+
+            
+
 
             <StorySection story={data.story} />
 
