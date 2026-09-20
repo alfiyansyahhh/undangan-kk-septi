@@ -18,7 +18,7 @@ export default function FooterSection({
           Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu.
         </p>
         <div className="gold-divider w-16 mx-auto" />
-        <p className="font-display text-xl text-white">
+        <p className="font-serif text-2xl sm:text-3xl tracking-wide text-white">
           {brideShortName} & {groomShortName}
         </p>
         <p className="text-xs text-[#c9a96e] font-medium tracking-wider">

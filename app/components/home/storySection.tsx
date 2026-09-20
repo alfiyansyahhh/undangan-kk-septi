@@ -1,33 +1,97 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { InvitationData } from "@/lib/gdrive";
+import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
 
 interface StorySectionProps {
   story?: InvitationData["story"];
+  photos?: string[];
 }
 
-export default function StorySection({ story }: StorySectionProps) {
+export default function StorySection({ story = [], photos = [] }: StorySectionProps) {
   if (!story || story.length === 0) return null;
 
+  // Helper untuk mendapatkan URL gambar yang valid
+  const getImageUrl = (rawSrc?: string) => {
+    if (!rawSrc) return "";
+    
+    // Jika sudah berupa URL lengkap (http/https)
+    if (rawSrc.startsWith("http://") || rawSrc.startsWith("https://")) {
+      return rawSrc;
+    }
+    
+    // Jika berupa ID Google Drive
+    return getDriveThumbnailUrl(rawSrc, 800);
+  };
+
   return (
-    <section className="px-6 py-10 space-y-6">
-      <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#c9a96e]">
-          Perjalanan Kami
-        </p>
-        <h2 className="font-display text-2xl text-white">Kisah Cinta</h2>
-        <div className="gold-divider w-24 mx-auto" />
+    <section className="px-6 py-12 text-white space-y-8 relative z-10 overflow-hidden">
+      {/* Header Title */}
+      <div className="text-center space-y-3">
+        <div className="flex items-center justify-center gap-4">
+          <div className="h-[1px] w-12 bg-stone-400/50" />
+          <h2 className="font-serif text-2xl sm:text-3xl tracking-widest text-white uppercase">
+            THE &bull; JOURNEY
+          </h2>
+          <div className="h-[1px] w-12 bg-stone-400/50" />
+        </div>
       </div>
 
-      <div className="space-y-4 relative border-l border-[#c9a96e]/30 ml-4 pl-6 pt-4">
-        {story.map((item, idx) => (
-          <div key={idx} className="relative space-y-1 pb-4">
-            <div className="absolute -left-[27px] top-1 w-3 h-3 rounded-full bg-[#c9a96e] border-2 border-[#0a0a0a] shadow" />
-            <span className="text-xs font-bold text-[#c9a96e] bg-[#c9a96e]/10 px-2 py-0.5 rounded">
-              {item.year}
-            </span>
-            <h3 className="font-medium text-white text-sm mt-1">{item.title}</h3>
-            <p className="text-xs text-stone-400 leading-relaxed">{item.desc}</p>
-          </div>
-        ))}
+      {/* Journey Cards Container */}
+      <div className="space-y-6 max-w-md mx-auto">
+        {story.map((item, idx) => {
+          const isEven = idx % 2 === 0;
+
+          // Cek gambar dari prop photos, fallback ke item.image jika ada, atau foto pertama
+        //   const rawPhoto = photos[idx] || (item as unknown as { image?: string }).image || photos[0];
+        //   const imgUrl = getImageUrl(rawPhoto);
+        const imgUrl = getDriveThumbnailUrl(photos[idx], 800);
+
+
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: isEven ? -60 : 60 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className={`p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center gap-4 shadow-xl ${
+                isEven ? "flex-row" : "flex-row-reverse"
+              }`}
+            >
+              {/* Foto Item */}
+              {imgUrl ? (
+                <div className="w-2/5 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden relative shadow-md bg-stone-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={imgUrl}
+                    alt={item.title || `Journey ${item.year}`}
+                    className="w-full h-full object-cover object-center"
+                    onError={(e) => {
+                      // Sembunyikan gambar jika gagal dimuat
+                      (e.target as HTMLElement).style.display = "none";
+                    }}
+                  />
+                </div>
+              ) : null}
+
+              {/* Teks Content */}
+              <div
+                className={`flex-1 space-y-2 text-stone-200 ${
+                  isEven ? "text-left" : "text-right"
+                }`}
+              >
+                <h3 className="font-serif text-base sm:text-lg text-white font-medium">
+                  {item.year || item.title}
+                </h3>
+                <p className="text-xs text-stone-300 font-serif leading-relaxed line-clamp-6 font-light">
+                  {item.desc}
+                </p>
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
     </section>
   );

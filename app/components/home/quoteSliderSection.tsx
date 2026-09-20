@@ -8,6 +8,7 @@ import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
 import "swiper/css";
 
 interface QuoteSliderSectionProps {
+  id: string
   quoteTitle?: string;
   quoteText?: string;
   gallery: string[]; // Array photoId dari Google Drive
@@ -15,6 +16,7 @@ interface QuoteSliderSectionProps {
 }
 
 export default function QuoteSliderSection({
+  id,
   quoteTitle = "Rgveda X.85.36",
   quoteText = "Dalam sebuah pernikahan kalian disatukan demi sebuah kebahagiaan dengan janji hati untuk saling membahagiakan. Bersamaku engkau akan hidup selamanya karena Tuhan pasti akan memberikan karunia sebagai pelindung dan saksi dalam pernikahan ini. Untuk itulah kalian dipersatukan dalam satu keluarga.",
   gallery = [],
@@ -24,7 +26,7 @@ export default function QuoteSliderSection({
   const displayPhotos = gallery.length > 0 ? [...gallery, ...gallery, ...gallery] : [];
 
   return (
-    <section className="py-16 px-6 bg-[#0a0a0a] border-t border-white/5 space-y-8 overflow-hidden">
+    <section id={id} className="py-16 px-6 bg-[#0a0a0a] border-t border-white/5 space-y-8 overflow-hidden">
       {/* Kutipan / Ayat Header */}
       <div className="max-w-xl mx-auto space-y-6">
         <div className="flex items-center gap-4">

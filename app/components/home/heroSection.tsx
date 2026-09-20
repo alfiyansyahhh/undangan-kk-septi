@@ -1,44 +1,49 @@
-    interface HeroSectionProps {
-    coverUrl: string;
-    brideShortName: string;
-    groomShortName: string;
-    quote: string;
-    quoteSource: string;
-    displayDate: string;
-    }
+"use client";
 
-    export default function HeroSection({
-    coverUrl,
-    brideShortName,
-    groomShortName,
-    quote,
-    quoteSource,
-    displayDate,
-    }: HeroSectionProps) {
-    return (
-        <section className="relative h-screen w-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-            src={coverUrl}
-            alt="Wedding Cover"
-            className="w-full h-full object-cover object-center animate-slow-zoom"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
-        <div className="absolute bottom-0 inset-x-0 text-center px-6 pb-12 space-y-4">
-            <h1 className="font-display text-4xl sm:text-5xl text-white leading-tight drop-shadow-lg">
-            {brideShortName} & {groomShortName}
-            </h1>
-            <div className="gold-divider w-24 mx-auto" />
-            <p className="text-xs sm:text-lg text-stone-300 italic leading-relaxed max-w-sm mx-auto font-serif-elegant">
-            &quot;{quote}&quot;
-            </p>
-            <p className="text-[11px] sm:text-lg text-[#c9a96e] font-medium tracking-wide">
-            {quoteSource}
-            </p>
-            <p className="text-sm sm:text-lg text-white tracking-widest font-light pt-2">
-            {displayDate}
-            </p>
+interface HeroSectionProps {
+  brideShortName: string;
+  groomShortName: string;
+  displayDate: string;
+}
+
+export default function HeroSection({
+  brideShortName,
+  groomShortName,
+  displayDate,
+}: HeroSectionProps) {
+  return (
+    <section className="relative w-full h-screen min-h-[600px] flex flex-col justify-end text-white bg-transparent">
+      {/* Hero Typography Content */}
+      <div className="relative z-10 text-center px-6 pb-16 pt-20 space-y-4 max-w-md mx-auto w-full">
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-stone-300 font-sans font-light">
+          THE WEDDING OF
+        </p>
+
+        <h1 className="font-serif text-2xl sm:text-3xl md:text-4xl text-white tracking-widest uppercase font-medium">
+          {groomShortName} &bull; {brideShortName}
+        </h1>
+
+        <p className="text-[10px] sm:text-xs tracking-[0.25em] text-stone-300 uppercase font-sans">
+          {displayDate}
+        </p>
+
+        {/* Scroll Indicator Icon */}
+        <div className="pt-8 animate-bounce opacity-70">
+          <svg
+            className="w-5 h-5 mx-auto text-stone-300"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.5}
+              d="M19 14l-7 7-7-7"
+            />
+          </svg>
         </div>
-        </section>
-    );
-    }
+      </div>
+    </section>
+  );
+}

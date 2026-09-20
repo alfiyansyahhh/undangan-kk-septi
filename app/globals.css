@@ -99,3 +99,20 @@ body {
 .swiper-wrapper {
   transition-timing-function: linear !important;
 }
+
+/* Overscan keeps blurred edges outside the viewport while the background moves. */
+@keyframes backgroundDrift {
+  from { transform: scale(1.12) translate3d(-1%, 0, 0); }
+  to { transform: scale(1.2) translate3d(1%, -1%, 0); }
+}
+
+.animate-background-drift {
+  animation: backgroundDrift 24s ease-in-out alternate infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-background-drift {
+    animation: none;
+    transform: scale(1.12);
+  }
+}

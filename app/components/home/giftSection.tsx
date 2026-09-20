@@ -33,11 +33,11 @@ export default function GiftSection({
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/30" />
 
       <div className="relative z-10 w-full p-8 pb-12 space-y-5">
-        <h2 className="font-display text-3xl sm:text-4xl text-white text-center">
+        <h2 className="font-serif text-2xl sm:text-3xl tracking-wide text-white text-center">
           Wedding Gift
         </h2>
         <div className="gold-divider w-24 mx-auto" />
-        <p className="text-sm text-stone-300 text-center leading-relaxed max-w-sm mx-auto font-serif-elegant">
+        <p className="text-sm text-stone-300 text-center leading-relaxed max-w-sm mx-auto font-sans">
           Tanpa mengurangi rasa hormat kami bagi tamu yang ingin mengirimkan hadiah kepada kedua mempelai, silahkan klik dibawah ini :
         </p>
 
@@ -46,7 +46,7 @@ export default function GiftSection({
             <select
               value={selectedGiftIdx}
               onChange={(e) => setSelectedGiftIdx(Number(e.target.value))}
-              className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm appearance-none cursor-pointer focus:outline-none focus:border-[#c9a96e]/50 font-serif-elegant"
+              className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm appearance-none cursor-pointer focus:outline-none focus:border-[#c9a96e]/50 font-sans"
             >
               {gifts.map((gift, idx) => (
                 <option key={idx} value={idx} className="bg-[#1a1a1a] text-white">
@@ -68,7 +68,7 @@ export default function GiftSection({
         </div>
 
         <div className="text-center">
-          <p className="text-lg font-mono text-[#c9a96e] tracking-widest">
+          <p className="text-lg font-sans tabular-nums text-[#c9a96e] tracking-widest">
             {currentGift.number}
           </p>
           <p className="text-xs text-stone-400 mt-1">

@@ -1,67 +1,147 @@
-import { InvitationData } from "@/lib/gdrive";
+"use client";
+
+import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
 
 interface EventSectionProps {
   events: InvitationData["events"];
+  photoAkad?: string;
+  photoResepsi?: string;
 }
 
-export default function EventSection({ events }: EventSectionProps) {
+export default function EventSection({
+  events,
+  photoAkad,
+  photoResepsi,
+}: EventSectionProps) {
+  const getImgUrl = (url?: string) => {
+    if (!url) return "";
+    return url.startsWith("http") ? url : getDriveThumbnailUrl(url, 600);
+  };
+
+  const akadImg = getImgUrl(photoAkad);
+  const resepsiImg = getImgUrl(photoResepsi);
+
   return (
-    <section className="px-6 py-10 space-y-6">
+    <section className="px-6 py-12 space-y-8 text-white relative z-10">
+      {/* Header Title */}
       <div className="text-center space-y-2">
-        <p className="text-[11px] uppercase tracking-[0.3em] text-[#c9a96e]">
-          Rangkaian Acara
+        <p className="text-[10px] sm:text-xs uppercase tracking-[0.35em] text-stone-300 font-sans font-light">
+          RANGKAIAN ACARA
         </p>
-        <h2 className="font-display text-2xl text-white">Waktu & Tempat</h2>
-        <div className="gold-divider w-24 mx-auto" />
+        <h2 className="font-serif text-2xl sm:text-3xl text-white tracking-wide">
+          Wedding &bull; Event
+        </h2>
+        <div className="w-16 h-[1px] bg-stone-400/50 mx-auto" />
       </div>
 
-      <div className="space-y-4 pt-4">
-        {/* Akad Nikah */}
-        <div className="p-5 rounded-xl bg-[#141414] border border-[#c9a96e]/20 text-center space-y-2">
-          <span className="inline-block px-3 py-1 bg-[#c9a96e]/15 text-[#c9a96e] rounded-full text-xs font-semibold tracking-wide">
-            {events.akad.title}
-          </span>
-          <p className="font-serif-elegant text-lg font-medium text-white pt-1">
-            {events.akad.date}
-          </p>
-          <p className="text-xs font-semibold text-[#c9a96e]">
-            ⏰ {events.akad.time}
-          </p>
-          <div className="pt-2 text-xs text-stone-300 space-y-1">
-            <p className="font-bold text-white">{events.akad.venue}</p>
-            <p className="text-stone-400">{events.akad.address}</p>
+      <div className="space-y-5 max-w-md mx-auto">
+        {/* CARD 1: Akad / Pawiwahan */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-stretch gap-4 shadow-xl">
+          {/* Foto Kiri */}
+          {akadImg && (
+            <div className="w-2/5 flex-shrink-0 rounded-xl overflow-hidden relative min-h-[140px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={akadImg}
+                alt={events.akad.title}
+                className="w-full h-full object-cover object-center absolute inset-0"
+              />
+            </div>
+          )}
+
+          {/* Detail Kanan */}
+          <div className="flex-1 flex flex-col justify-between py-0.5 space-y-2 text-left">
+            <div className="space-y-1">
+              <h3 className="font-serif text-xl sm:text-2xl text-white leading-tight">
+                {events.akad.title}
+              </h3>
+              <p className="text-xs text-stone-300 font-sans">
+                {events.akad.date}
+              </p>
+              <p className="text-xs text-stone-300 font-sans">
+                {events.akad.time}
+              </p>
+              <p className="text-xs font-semibold text-white pt-1">
+                {events.akad.venue}
+              </p>
+              <p className="text-[11px] text-stone-400 font-light leading-tight line-clamp-2">
+                {events.akad.address}
+              </p>
+            </div>
+
+            {/* Location Pill Button */}
+            <div className="pt-1">
+              <a
+                href={events.akad.mapsUrl || "https://maps.google.com"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black text-xs font-medium hover:bg-stone-200 transition-colors shadow-md"
+              >
+                <svg
+                  className="w-3.5 h-3.5 fill-current"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                </svg>
+                <span>Location</span>
+              </a>
+            </div>
           </div>
         </div>
 
-        {/* Resepsi */}
-        <div className="p-5 rounded-xl bg-[#141414] border border-[#c9a96e]/20 text-center space-y-2">
-          <span className="inline-block px-3 py-1 bg-[#c9a96e]/15 text-[#c9a96e] rounded-full text-xs font-semibold tracking-wide">
-            {events.resepsi.title}
-          </span>
-          <p className="font-serif-elegant text-lg font-medium text-white pt-1">
-            {events.resepsi.date}
-          </p>
-          <p className="text-xs font-semibold text-[#c9a96e]">
-            ⏰ {events.resepsi.time}
-          </p>
-          <div className="pt-2 text-xs text-stone-300 space-y-1">
-            <p className="font-bold text-white">{events.resepsi.venue}</p>
-            <p className="text-stone-400">{events.resepsi.address}</p>
+        {/* CARD 2: Resepsi */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-stretch gap-4 shadow-xl">
+          {/* Foto Kiri */}
+          {resepsiImg && (
+            <div className="w-2/5 flex-shrink-0 rounded-xl overflow-hidden relative min-h-[140px]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={resepsiImg}
+                alt={events.resepsi.title}
+                className="w-full h-full object-cover object-center absolute inset-0"
+              />
+            </div>
+          )}
+
+          {/* Detail Kanan */}
+          <div className="flex-1 flex flex-col justify-between py-0.5 space-y-2 text-left">
+            <div className="space-y-1">
+              <h3 className="font-serif text-xl sm:text-2xl text-white leading-tight">
+                {events.resepsi.title}
+              </h3>
+              <p className="text-xs text-stone-300 font-sans">
+                {events.resepsi.date}
+              </p>
+              <p className="text-xs text-stone-300 font-sans">
+                {events.resepsi.time}
+              </p>
+              <p className="text-xs font-semibold text-white pt-1">
+                {events.resepsi.venue}
+              </p>
+              <p className="text-[11px] text-stone-400 font-light leading-tight line-clamp-2">
+                {events.resepsi.address}
+              </p>
+            </div>
+
+            {/* Location Pill Button */}
+            <div className="pt-1">
+              <a
+                href={events.resepsi.mapsUrl || "https://maps.google.com"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white text-black text-xs font-medium hover:bg-stone-200 transition-colors shadow-md"
+              >
+                <svg
+                  className="w-3.5 h-3.5 fill-current"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                </svg>
+                <span>Location</span>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Maps Button */}
-      <div className="pt-2">
-        <a
-          href={events.resepsi.mapsUrl || "https://maps.google.com"}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full py-3 px-4 rounded-xl bg-[#c9a96e] hover:bg-[#ddc08a] text-black text-xs font-semibold transition flex items-center justify-center gap-2 shadow-sm"
-        >
-          <span>📍</span>
-          <span>Buka Petunjuk Arah (Google Maps)</span>
-        </a>
       </div>
     </section>
   );
