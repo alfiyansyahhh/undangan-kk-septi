@@ -33,7 +33,14 @@ export interface InvitationData {
   photos: {
     cover: string;
     coverId?: string;
-    gallery: string[]; // List of Photo IDs
+    gallery: string[];
+    coverSlides?: string[];
+    background?: string[];
+    quoteSlides?: string[];
+    akad?: string;
+    resepsi?: string;
+    gift?: string;
+    galleryCover?: string;
   };
   events: {
     targetDate: string;
@@ -56,10 +63,21 @@ export interface InvitationData {
     };
   };
   story?: Array<{
+    image?: string;
     year: string;
     title: string;
     desc: string;
   }>;
+  sections?: {
+    galleryTitle?: string;
+    galleryVideo?: string;
+    storyTitle?: string;
+    giftTitle?: string;
+    giftDescription?: string;
+    wishTitle?: string;
+    wishDescription?: string;
+    footerText?: string;
+  };
   gifts?: Array<{
     bank: string;
     number: string;
@@ -102,6 +120,8 @@ export function extractDriveId(urlOrId: string): string | null {
  * Mendapatkan URL gambar thumbnail Google Drive yang cepat untuk web
  */
 export function getDriveThumbnailUrl(idOrUrl: string, width = 800): string {
+  if (!idOrUrl) return "";
+  if (/^(https?:\/\/|\/)/.test(idOrUrl) && !extractDriveId(idOrUrl)) return idOrUrl;
   const id = extractDriveId(idOrUrl) || idOrUrl;
   return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
 }
@@ -110,6 +130,8 @@ export function getDriveThumbnailUrl(idOrUrl: string, width = 800): string {
  * Mendapatkan URL resolusi tinggi Google User Content CDN
  */
 export function getDriveFullUrl(idOrUrl: string): string {
+  if (!idOrUrl) return "";
+  if (/^(https?:\/\/|\/)/.test(idOrUrl) && !extractDriveId(idOrUrl)) return idOrUrl;
   const id = extractDriveId(idOrUrl) || idOrUrl;
   return `https://lh3.googleusercontent.com/d/${id}`;
 }

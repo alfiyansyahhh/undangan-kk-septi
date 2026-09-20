@@ -7,11 +7,15 @@ import { useState } from "react";
 import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
 
 interface GallerySectionProps {
+  title?: string;
+  coverPhoto?: string;
   gallery: string[];
   videoUrl?: string;
 }
 
 export default function GallerySection({
+  title,
+  coverPhoto,
   gallery = [],
   videoUrl,
 }: GallerySectionProps) {
@@ -36,19 +40,20 @@ export default function GallerySection({
   };
 
   const photos = gallery.filter(Boolean);
+  const featured = coverPhoto || photos[0];
 
   return (
     <section className="relative z-10 px-6 py-10 sm:px-8">
       <div className="mx-auto max-w-md space-y-6">
         <motion.div {...revealMotion("title", 0)} className="flex items-center gap-4 pb-3">
           <h2 className="shrink-0 font-serif text-2xl sm:text-3xl text-white tracking-wide uppercase">
-            Gallery
+            {title || "Gallery"}
           </h2>
           <div aria-hidden="true" className="h-px flex-1 bg-white/80" />
         </motion.div>
 
         {/* Show the supplied video, or use a gallery photo as the wide cover. */}
-        {(videoUrl || photos.length > 0) && (
+        {(videoUrl || featured) && (
           <motion.div {...revealMotion("zoom", 0.1)} className="aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black/50 sm:rounded-2xl">
             {videoUrl ? (
               <iframe
@@ -62,13 +67,13 @@ export default function GallerySection({
             ) : (
               <button
                 type="button"
-                onClick={() => setActiveModalPhoto(getFullUrl(photos[0]))}
+                onClick={() => setActiveModalPhoto(getFullUrl(featured))}
                 aria-label="Perbesar foto utama galeri"
                 className="block h-full w-full cursor-pointer focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={getThumbUrl(photos[0])}
+                  src={getThumbUrl(featured)}
                   alt="Foto utama galeri"
                   className="h-full w-full object-cover"
                   loading="lazy"

@@ -7,6 +7,8 @@ import { useState } from "react";
 import { InvitationData } from "@/lib/gdrive";
 
 interface GiftSectionProps {
+  title?: string;
+  description?: string;
   gifts?: InvitationData["gifts"];
   coverUrl: string;
   onCopy: (number: string, bank: string) => void;
@@ -14,6 +16,8 @@ interface GiftSectionProps {
 }
 
 export default function GiftSection({
+  title,
+  description,
   gifts,
   coverUrl,
   onCopy,
@@ -37,11 +41,11 @@ export default function GiftSection({
 
       <div className="relative z-10 w-full p-8 pb-12 space-y-5">
         <motion.h2 {...revealMotion("fade", 0)} className="font-serif text-2xl sm:text-3xl tracking-wide text-white text-center">
-          Wedding Gift
+          {title || "Wedding Gift"}
         </motion.h2>
         <div className="gold-divider w-24 mx-auto" />
         <motion.p {...revealMotion("text", 0.1)} className="text-sm text-stone-300 text-center leading-relaxed max-w-sm mx-auto font-sans">
-          Tanpa mengurangi rasa hormat kami bagi tamu yang ingin mengirimkan hadiah kepada kedua mempelai, silahkan klik dibawah ini :
+          {description || "Tanpa mengurangi rasa hormat kami bagi tamu yang ingin mengirimkan hadiah kepada kedua mempelai, silahkan klik dibawah ini :"}
         </motion.p>
 
         <motion.div {...revealMotion("text", 0.2)} className="flex items-center gap-3 max-w-sm mx-auto pt-2">

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import WishesEditor from "@/app/components/admin/wishesEditor";
+import SectionEditor from "@/app/components/admin/sectionEditor";
 import {
   GDrivePhoto,
   InvitationData,
@@ -16,7 +18,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
-  const [activeTab, setActiveTab] = useState<"photos" | "info">("photos");
+  const [activeTab, setActiveTab] = useState<"photos" | "info" | "sections" | "wishes">("photos");
   const [customLinkInput, setCustomLinkInput] = useState("");
 
   // Load initial data
@@ -27,12 +29,14 @@ export default function AdminPage() {
           fetch("/api/invitation"),
           fetch("/api/photos"),
         ]);
+        if (!resData.ok || !resPhotos.ok) throw new Error("Gagal memuat database");
         const jsonInv = await resData.json();
         const jsonPhotos = await resPhotos.json();
         setData(jsonInv);
         setPhotos(jsonPhotos);
       } catch (err) {
         console.error("Gagal memuat data:", err);
+        setSaveMessage({ text: "Gagal memuat admin. Muat ulang untuk mencoba lagi.", type: "error" });
       } finally {
         setLoading(false);
       }
@@ -51,10 +55,10 @@ export default function AdminPage() {
         body: JSON.stringify(data),
       });
       const result = await res.json();
-      if (result.success) {
+      if (res.ok && result.success) {
         setSaveMessage({ text: "✅ Perubahan berhasil disimpan!", type: "success" });
       } else {
-        setSaveMessage({ text: "❌ Gagal menyimpan data.", type: "error" });
+        setSaveMessage({ text: result.message || "❌ Gagal menyimpan data.", type: "error" });
       }
     } catch {
       setSaveMessage({ text: "❌ Terjadi kesalahan saat menyimpan.", type: "error" });
@@ -295,7 +299,7 @@ export default function AdminPage() {
   };
 
   // Add custom photo link from outside
-  const handleAddCustomPhoto = () => {
+  const handleAddCustomPhoto = async () => {
     const id = extractDriveId(customLinkInput);
     if (!id) {
       alert("Format link atau ID Google Drive tidak valid!");
@@ -307,12 +311,16 @@ export default function AdminPage() {
       thumbnail: getDriveThumbnailUrl(id),
       full: getDriveFullUrl(id),
     };
-    if (!photos.some((p) => p.id === id)) {
-      setPhotos([newPhoto, ...photos]);
-    }
-    setCustomLinkInput("");
+    try {
+      const response = await fetch("/api/photos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ photos: [newPhoto] }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.message);
+      setPhotos(result.photos);
+      setCustomLinkInput("");
+    } catch { setSaveMessage({ text: "Gagal menyimpan foto. Silakan coba lagi.", type: "error" }); }
   };
 
+  if (!loading && !data) return <div className="p-8 text-white">Gagal memuat data admin. <button onClick={() => window.location.reload()}>Coba lagi</button></div>;
   if (loading || !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-100 text-stone-600">
@@ -395,6 +403,11 @@ export default function AdminPage() {
             📝 Data Mempelai & Acara
           </button>
         </div>
+
+        <button type="button" onClick={() => setActiveTab("sections")} className={`mb-6 rounded-lg px-5 py-3 text-sm font-semibold ${activeTab === "sections" ? "bg-amber-600 text-white" : "bg-white border border-stone-300"}`}>Section, Foto &amp; Cerita</button>
+        <button type="button" onClick={() => setActiveTab("wishes")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">Buku Tamu</button>
+        {activeTab === "wishes" && <WishesEditor />}
+        {activeTab === "sections" && <SectionEditor data={data} photos={photos} onChange={setData} />}
 
         {/* TAB 1: MASTER FOTO GDRIVE */}
         {activeTab === "photos" && (
@@ -1281,7 +1294,7 @@ export default function AdminPage() {
 
               <div className="mt-4">
                 <label className="block text-xs font-medium text-stone-600 mb-1">
-                  Link Google Maps (untuk tombol penunjuk arah di undangan)
+                  Link Google Maps Resepsi (link akad bisa diatur di tab Section)
                 </label>
                 <input
                   type="text"
@@ -1291,7 +1304,6 @@ export default function AdminPage() {
                       ...data,
                       events: {
                         ...data.events,
-                        akad: { ...data.events.akad, mapsUrl: e.target.value },
                         resepsi: { ...data.events.resepsi, mapsUrl: e.target.value },
                       },
                     })
@@ -1354,12 +1366,14 @@ export default function AdminPage() {
 
             {/* Rekening Hadiah */}
             <section className="bg-white p-5 rounded-xl border border-stone-200 shadow-xs space-y-3">
+              <button type="button" className="text-sm text-amber-700" onClick={() => setData({ ...data, gifts: [...(data.gifts || []), { bank: "", number: "", holder: "" }] })}>+ Tambah rekening</button>
               <h2 className="font-bold text-stone-900 text-base flex items-center gap-2">
                 <span>🎁</span> Rekening Hadiah / Amplop Digital
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {data.gifts?.map((gift, idx) => (
                   <div key={idx} className="p-3 bg-stone-50 border border-stone-200 rounded-lg space-y-2">
+                    <button type="button" className="text-xs text-red-700" onClick={() => setData({ ...data, gifts: data.gifts?.filter((_,i) => i !== idx) })}>Hapus rekening</button>
                     <div>
                       <label className="block text-xs font-medium text-stone-600 mb-1">Nama Bank / Dompet Digital</label>
                       <input

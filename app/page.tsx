@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { InvitationData, getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
+import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
 import defaultData from "@/data/invitation-data.json";
 
 // Import semua Section yang sudah dipisah
@@ -29,22 +29,7 @@ function InvitationContent() {
   const [activeModalPhoto, setActiveModalPhoto] = useState<string | null>(null);
 
   // Wishes State
-  const [wishes, setWishes] = useState<Wish[]>([
-    {
-      id: "1",
-      name: "Rian & Sarah",
-      attendance: "Hadir",
-      message: "Selamat! Semoga menjadi keluarga yang sakinah, mawaddah, warahmah. Bahagia selalu sampai kakek nenek.",
-      time: "1 jam yang lalu",
-    },
-    {
-      id: "2",
-      name: "Dinda Lestari",
-      attendance: "Hadir",
-      message: "Barakallahu lakuma wa baraka alaikuma wa jama'a bainakuma fii khair. Lancar sampai hari H yaa!",
-      time: "3 jam yang lalu",
-    },
-  ]);
+  const [wishes, setWishes] = useState<Wish[]>([]);
 
   // Countdown State
   const [timeLeft, setTimeLeft] = useState({
@@ -69,32 +54,32 @@ function InvitationContent() {
     }
     loadData();
 
-    try {
-      const storedWishes = localStorage.getItem("wedding_wishes_meila_arif");
-      if (storedWishes) {
-        const stored: unknown = JSON.parse(storedWishes);
-        if (Array.isArray(stored)) {
-          const ids = new Set<string>();
-          const restored = stored.filter((item): item is Wish =>
-            item !== null && typeof item === "object" &&
-            typeof item.name === "string" && typeof item.message === "string" &&
-            typeof item.time === "string" &&
-            ["Hadir", "Tidak Hadir", "Ragu-ragu"].includes(item.attendance)
-          ).map((wish) => {
-            let id = wish.id;
-            if (typeof id !== "string" || !id.trim() || ids.has(id)) {
-              do { id = crypto.randomUUID(); } while (ids.has(id));
+    async function loadWishes() {
+      try {
+        // Keep the original browser backup; migrate it once, with idempotent IDs.
+        try {
+        const legacy = localStorage.getItem("wedding_wishes_meila_arif");
+        if (legacy && !localStorage.getItem("wedding_wishes_sqlite_migrated")) {
+          const old: unknown = JSON.parse(legacy);
+          if (Array.isArray(old)) {
+            for (const item of old) {
+              if (!item || typeof item.name !== "string" || typeof item.message !== "string") continue;
+              const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify([item.id, item.name, item.message, item.time])));
+              const hash = Array.from(new Uint8Array(bytes), b => b.toString(16).padStart(2, "0")).join("");
+              const id = `${hash.slice(0,8)}-${hash.slice(8,12)}-${hash.slice(12,16)}-${hash.slice(16,20)}-${hash.slice(20,32)}`;
+              const migrated = await fetch("/api/wishes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...item, id }) });
+              if (!migrated.ok) throw new Error("Ucapan lama belum berhasil dipindahkan");
             }
-            ids.add(id);
-            return { ...wish, id };
-          });
-          setWishes(restored);
-          localStorage.setItem("wedding_wishes_meila_arif", JSON.stringify(restored));
+            localStorage.setItem("wedding_wishes_sqlite_migrated", "true");
+          }
         }
-      }
-    } catch {
-      // ignore
+        } catch (error) { console.error("Migrasi ucapan lokal tertunda:", error); }
+        const res = await fetch("/api/wishes", { cache: "no-store" });
+        if (!res.ok) throw new Error("Gagal memuat ucapan");
+        setWishes(await res.json());
+      } catch (error) { console.error(error); }
     }
+    loadWishes();
   }, []);
 
   // Countdown timer logic
@@ -134,33 +119,29 @@ function InvitationContent() {
     setTimeout(() => setCopiedBank(null), 2500);
   };
 
-  const handleAddWish = (wishData: Omit<Wish, "id" | "time">) => {
-    const newWish: Wish = {
-      id: crypto.randomUUID(),
-      ...wishData,
-      time: "Baru saja",
-    };
-
-    const updated = [newWish, ...wishes];
-    setWishes(updated);
-    try {
-      localStorage.setItem("wedding_wishes_meila_arif", JSON.stringify(updated));
-    } catch {
-      // ignore
-    }
+  const handleAddWish = async (wishData: Omit<Wish, "id" | "time">) => {
+    const response = await fetch("/api/wishes", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...wishData, id: crypto.randomUUID() }),
+    });
+    if (!response.ok) throw new Error("Gagal menyimpan ucapan");
+    const saved: Wish = await response.json();
+    setWishes(current => [saved, ...current.filter(w => w.id !== saved.id)]);
   };
 
-  const coverUrl = data.photos.cover || getDriveThumbnailUrl("1uwgIpksRY4BUmCPb1LtoNW3jtY2COuzI", 1200);
+  useEffect(() => { document.title = data.couple.title; }, [data.couple.title]);
+
+  const coverUrl = getDriveThumbnailUrl(data.photos.cover || "1uwgIpksRY4BUmCPb1LtoNW3jtY2COuzI", 1200);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative font-sans">
      
-     <GlobalBackground photos={data.photos.gallery} />
+     <GlobalBackground photos={data.photos.background?.length ? data.photos.background : data.photos.gallery.length ? data.photos.gallery : [coverUrl]} />
 
       {/* 1. COVER SCREEN */}
       <CoverSection
         isOpen={isOpen}
-        coverPhotos={data.photos.gallery}
+        coverPhotos={data.photos.coverSlides?.length ? data.photos.coverSlides : data.photos.gallery.length ? data.photos.gallery : [coverUrl]}
         brideShortName={data.couple.bride.shortName}
         groomShortName={data.couple.groom.shortName}
         displayDate={data.events.displayDate}
@@ -212,9 +193,9 @@ function InvitationContent() {
             {/* Quote + Auto-Scroll Slider Marquee */}
             <QuoteSliderSection
               id="quote-slider-section"
-              quoteTitle="Rgveda X.85.36"
-              quoteText="Dalam sebuah pernikahan kalian disatukan demi sebuah kebahagiaan dengan janji hati untuk saling membahagiakan. Bersamaku engkau akan hidup selamanya karena Tuhan pasti akan memberikan karunia sebagai pelindung dan saksi dalam pernikahan ini. Untuk itulah kalian dipersatukan dalam satu keluarga."
-              gallery={data.photos.gallery}
+              quoteTitle={data.couple.quoteSource}
+              quoteText={data.couple.quote}
+              gallery={data.photos.quoteSlides?.length ? data.photos.quoteSlides : data.photos.gallery}
               onSelectPhoto={(url) => setActiveModalPhoto(url)}
             />
 
@@ -229,33 +210,37 @@ function InvitationContent() {
 
             {/* Event Section */}
             <EventSection 
-              photoAkad={data.photos.cover}
-              photoResepsi={data.photos.cover}
+              photoAkad={data.photos.akad || data.photos.cover}
+              photoResepsi={data.photos.resepsi || data.photos.cover}
               events={data.events} 
             />
 
             {/* Gallery Grid Masonry */}
-            <GallerySection gallery={data.photos.gallery} />
+            <GallerySection gallery={data.photos.gallery} coverPhoto={data.photos.galleryCover} videoUrl={data.sections?.galleryVideo} title={data.sections?.galleryTitle} />
 
             {/* Love Story Section */}
             <StorySection 
+              title={data.sections?.storyTitle}
               story={data.story} 
               photos={data.photos.gallery}
             />
 
             {/* Gift Section */}
             <GiftSection
+              title={data.sections?.giftTitle}
+              description={data.sections?.giftDescription}
               gifts={data.gifts}
-              coverUrl={coverUrl}
+              coverUrl={getDriveThumbnailUrl(data.photos.gift || coverUrl)}
               onCopy={handleCopyAccount}
               copiedBank={copiedBank}
             />
 
             {/* Wish / Ucapan Section */}
-            <WishSection wishes={wishes} onSubmitWish={handleAddWish} />
+            <WishSection title={data.sections?.wishTitle} description={data.sections?.wishDescription} wishes={wishes} onSubmitWish={handleAddWish} />
 
             {/* Footer Section */}
             <FooterSection
+              text={data.sections?.footerText}
               brideShortName={data.couple.bride.shortName}
               groomShortName={data.couple.groom.shortName}
               hashtag={data.couple.hashtag}

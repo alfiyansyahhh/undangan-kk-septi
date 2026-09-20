@@ -14,23 +14,35 @@ export interface Wish {
 }
 
 interface WishSectionProps {
+  title?: string;
+  description?: string;
   wishes: Wish[];
-  onSubmitWish: (newWish: Omit<Wish, "id" | "time">) => void;
+  onSubmitWish: (newWish: Omit<Wish, "id" | "time">) => Promise<void>;
 }
 
-export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) {
+export default function WishSection({
+  title,
+  description, wishes, onSubmitWish }: WishSectionProps) {
   const [wishForm, setWishForm] = useState({
     name: "",
     attendance: "Hadir" as "Hadir" | "Tidak Hadir" | "Ragu-ragu",
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!wishForm.name || !wishForm.message) return;
 
-    onSubmitWish(wishForm);
-    setWishForm({ name: "", attendance: "Hadir", message: "" });
+    if (sending) return;
+    setSending(true);
+    setError("");
+    try {
+      await onSubmitWish(wishForm);
+      setWishForm({ name: "", attendance: "Hadir", message: "" });
+    } catch { setError("Ucapan belum tersimpan. Silakan coba lagi."); }
+    finally { setSending(false); }
   };
 
   return (
@@ -40,10 +52,10 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
         <p className="text-[10px] font-sans font-light uppercase tracking-[0.4em] text-[#c9a96e]">
           Buku Tamu
         </p>
-        <h2 className="font-serif text-2xl sm:text-3xl tracking-wide text-white">Ucapan & Doa Restu</h2>
+        <h2 className="font-serif text-2xl sm:text-3xl tracking-wide text-white">{title || "Ucapan & Doa Restu"}</h2>
         <div className="gold-divider w-24 mx-auto" />
         <p className="mx-auto max-w-[260px] text-xs leading-6 text-stone-300">
-          Kirimkan doa dan ucapan terbaik untuk kedua mempelai
+          {description || "Kirimkan doa dan ucapan terbaik untuk kedua mempelai"}
         </p>
       </motion.div>
 
@@ -95,10 +107,12 @@ export default function WishSection({ wishes, onSubmitWish }: WishSectionProps) 
 
         <button
           type="submit"
+          disabled={sending}
           className="min-h-12 w-full cursor-pointer rounded-full border border-[#ddc08a]/40 bg-gradient-to-r from-[#c9a96e] to-[#b3945c] px-4 py-3 text-[11px] font-medium uppercase tracking-[0.16em] text-[#19150e] transition-colors hover:from-[#ddc08a] hover:to-[#c9a96e] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ddc08a]"
         >
-          Kirim Ucapan & Doa
+          {sending ? "Menyimpan…" : "Kirim Ucapan & Doa"}
         </button>
+        {error && <p role="alert" className="text-sm text-red-300">{error}</p>}
       </motion.form>
 
       <div className="space-y-5">

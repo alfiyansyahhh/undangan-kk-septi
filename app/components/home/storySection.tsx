@@ -4,14 +4,16 @@ import { revealMotion } from "./revealMotion";
 
 import { motion } from "framer-motion";
 import { InvitationData } from "@/lib/gdrive";
-import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
+import { getDriveThumbnailUrl } from "@/lib/gdrive";
 
 interface StorySectionProps {
+  title?: string;
   story?: InvitationData["story"];
   photos?: string[];
 }
 
-export default function StorySection({ story = [], photos = [] }: StorySectionProps) {
+export default function StorySection({
+  title, story = [], photos = [] }: StorySectionProps) {
   if (!story || story.length === 0) return null;
 
   // Helper untuk mendapatkan URL gambar yang valid
@@ -34,7 +36,7 @@ export default function StorySection({ story = [], photos = [] }: StorySectionPr
         <div className="flex items-center justify-center gap-4">
           <div className="h-[1px] w-12 bg-stone-400/50" />
           <h2 className="font-serif text-2xl sm:text-3xl tracking-widest text-white uppercase">
-            THE &bull; JOURNEY
+            {title || "THE • JOURNEY"}
           </h2>
           <div className="h-[1px] w-12 bg-stone-400/50" />
         </div>
@@ -45,10 +47,7 @@ export default function StorySection({ story = [], photos = [] }: StorySectionPr
         {story.map((item, idx) => {
           const isEven = idx % 2 === 0;
 
-          // Cek gambar dari prop photos, fallback ke item.image jika ada, atau foto pertama
-        //   const rawPhoto = photos[idx] || (item as unknown as { image?: string }).image || photos[0];
-        //   const imgUrl = getImageUrl(rawPhoto);
-        const imgUrl = getDriveThumbnailUrl(photos[idx], 800);
+          const imgUrl = getImageUrl(item.image || photos[idx] || photos[0]);
 
 
           return (
@@ -85,8 +84,9 @@ export default function StorySection({ story = [], photos = [] }: StorySectionPr
                 }`}
               >
                 <h3 className="font-serif text-base sm:text-lg text-white font-medium">
-                  {item.year || item.title}
+                  {item.title || item.year}
                 </h3>
+                <p className="text-[10px] tracking-widest text-stone-400">{item.year}</p>
                 <p className="text-xs text-stone-300 font-serif leading-relaxed line-clamp-6 font-light">
                   {item.desc}
                 </p>
