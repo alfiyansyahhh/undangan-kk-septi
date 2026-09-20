@@ -183,14 +183,7 @@ function InvitationContent() {
             
             {/* Hero section tetep muncul di mobile, tapi bisa disembunyikan di desktop kalau mau */}
             {/* <div className="lg:hidden"> */}
-              <HeroSection
-                coverUrl={coverUrl}
-                brideShortName={data.couple.bride.shortName}
-                groomShortName={data.couple.groom.shortName}
-                quote={data.couple.quote}
-                quoteSource={data.couple.quoteSource}
-                displayDate={data.events.displayDate}
-              />
+        
             {/* </div> */}
 
             {/* Rangkaian Section Utama */}
@@ -230,6 +223,14 @@ function InvitationContent() {
 
             <WishSection wishes={wishes} onSubmitWish={handleAddWish} />
 
+            <HeroSection
+              coverUrl={coverUrl}
+              brideShortName={data.couple.bride.shortName}
+              groomShortName={data.couple.groom.shortName}
+              quote={data.couple.quote}
+              quoteSource={data.couple.quoteSource}
+              displayDate={data.events.displayDate}
+            />
             <FooterSection
               brideShortName={data.couple.bride.shortName}
               groomShortName={data.couple.groom.shortName}
