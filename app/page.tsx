@@ -17,6 +17,7 @@ import GiftSection from "./components/home/giftSection";
 import WishSection, { Wish } from "./components/home/wishSection";
 import FooterSection from "./components/home/footerSection";
 import QuoteSliderSection from "./components/home/quoteSliderSection";
+import MusicPlayer from "./components/home/musicPlayer";
 import GlobalBackground from "./components/home/globalBackground";
 
 function InvitationContent() {
@@ -135,6 +136,7 @@ function InvitationContent() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative font-sans">
      
+     <MusicPlayer music={data.music} isOpen={isOpen} />
      <GlobalBackground photos={slideshowPhotos} />
 
       {/* 1. COVER SCREEN */}

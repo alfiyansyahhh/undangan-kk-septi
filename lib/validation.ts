@@ -14,5 +14,11 @@ export function validInvitation(value: unknown): value is InvitationData {
   if (value.sections !== undefined && (!object(value.sections) || !Object.values(value.sections).every(v => typeof v === "string"))) return false;
   if (value.story !== undefined && (!Array.isArray(value.story) || !value.story.every(v => fields(v, ["year", "title", "desc"]) && (v.image === undefined || typeof v.image === "string")))) return false;
   if (value.gifts !== undefined && (!Array.isArray(value.gifts) || !value.gifts.every(v => fields(v, ["bank", "number", "holder"])))) return false;
+  if (value.music !== undefined) {
+    const m = value.music;
+    if (!object(m) || typeof m.enabled !== "boolean" || typeof m.title !== "string" || typeof m.url !== "string" || typeof m.loop !== "boolean" || typeof m.volume !== "number" || !Number.isFinite(m.volume) || m.volume < 0 || m.volume > 1) return false;
+    if (m.url && !/^https?:\/\//.test(m.url) && !/^\/(?!\/)/.test(m.url)) return false;
+    if (m.enabled && !m.url) return false;
+  }
   return true;
 }

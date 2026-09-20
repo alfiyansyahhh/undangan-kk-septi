@@ -6,6 +6,7 @@ export interface GDrivePhoto {
 }
 
 export interface InvitationData {
+  music?: { enabled: boolean; title: string; url: string; volume: number; loop: boolean };
   couple: {
     title: string;
     hashtag: string;

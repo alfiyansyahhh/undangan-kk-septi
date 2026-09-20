@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import MusicEditor from "./musicEditor";
 import ShareEditor from "./shareEditor";
 import WishesEditor from "@/app/components/admin/wishesEditor";
 import SectionEditor from "@/app/components/admin/sectionEditor";
@@ -19,7 +20,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
-  const [activeTab, setActiveTab] = useState<"photos" | "info" | "sections" | "wishes" | "share">("photos");
+  const [activeTab, setActiveTab] = useState<"photos" | "info" | "sections" | "wishes" | "share" | "music">("photos");
   const [customLinkInput, setCustomLinkInput] = useState("");
 
   // Load initial data
@@ -412,6 +413,8 @@ export default function AdminPage() {
         <button type="button" onClick={() => setActiveTab("sections")} className={`mb-6 rounded-lg px-5 py-3 text-sm font-semibold ${activeTab === "sections" ? "bg-amber-600 text-white" : "bg-white border border-stone-300"}`}>Section, Foto &amp; Cerita</button>
         <button type="button" onClick={() => setActiveTab("wishes")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">Buku Tamu</button>
         <button type="button" onClick={() => setActiveTab("share")} className="mb-6 ml-3 rounded-lg bg-emerald-700 px-5 py-3 text-sm font-semibold text-white">Bagikan Undangan</button>
+        <button type="button" onClick={() => setActiveTab("music")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">♫ Lagu</button>
+        {activeTab === "music" && <MusicEditor data={data} onChange={setData} />}
         {activeTab === "share" && <ShareEditor data={data} onChange={setData} />}
         {activeTab === "wishes" && <WishesEditor />}
         {activeTab === "sections" && <SectionEditor data={data} photos={photos} onChange={setData} />}
