@@ -5,13 +5,13 @@ import { getDriveFullUrl, getDriveThumbnailUrl } from "@/lib/gdrive";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
-  try { return NextResponse.json(readPhotos(), { headers: { "Cache-Control": "no-store" } }); }
+  try { return NextResponse.json(await readPhotos(), { headers: { "Cache-Control": "no-store" } }); }
   catch (error) { console.error(error); return NextResponse.json({ message: "Gagal membaca foto" }, { status: 500 }); }
 }
 export async function POST(request: Request) {
-  const denied = requireAdmin(request);
+  const denied = await requireAdmin(request);
   if (denied) return denied;
   let body;
   try { body = await request.json(); } catch { return NextResponse.json({ message: "JSON tidak valid" }, { status: 400 }); }
@@ -19,8 +19,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Daftar foto atau ID tidak valid" }, { status: 400 });
   }
   try {
-    savePhotos(body.photos.map((p: { id: string; name?: string }) => ({ id: p.id, name: p.name || `IMG_${p.id.slice(0, 6)}`, thumbnail: getDriveThumbnailUrl(p.id), full: getDriveFullUrl(p.id) })));
-    const photos = readPhotos();
+    await savePhotos(body.photos.map((p: { id: string; name?: string }) => ({ id: p.id, name: p.name || `IMG_${p.id.slice(0, 6)}`, thumbnail: getDriveThumbnailUrl(p.id), full: getDriveFullUrl(p.id) })));
+    const photos = await readPhotos();
     return NextResponse.json({ success: true, photos, total: photos.length });
   } catch (error) { console.error(error); return NextResponse.json({ message: "Gagal menyimpan foto" }, { status: 500 }); }
 }

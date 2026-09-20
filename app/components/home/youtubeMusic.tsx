@@ -1,4 +1,5 @@
 "use client";
+import MusicIcon from "./musicIcon";
 import { useEffect, useRef, useState } from "react";
 interface Player {
   playVideo(): void; pauseVideo(): void; destroy(): void; setVolume(value:number): void;
@@ -31,6 +32,13 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
   const [error,setError]=useState("");
   const volumeRef=useRef(volume);
   useEffect(()=>{volumeRef.current=volume;player.current?.setVolume(volume*100);},[volume]);
+  useEffect(() => {
+    const pause = () => player.current?.pauseVideo();
+    const onVisibility = () => { if (document.hidden) pause(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", pause);
+    return () => { document.removeEventListener("visibilitychange", onVisibility); window.removeEventListener("pagehide", pause); };
+  }, []);
   useEffect(()=> {
     let cancelled=false;
     let instance:Player | undefined;
@@ -41,8 +49,8 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
         videoId:id,
         playerVars:{playsinline:1,controls:0,origin:window.location.origin,loop:loop?1:0,playlist:loop?id:""},
         events:{
-          onReady:({target})=>{if(cancelled)return;player.current=target;target.setVolume(volumeRef.current*100);setReady(true);if(!preview)target.playVideo();},
-          onStateChange:({data})=>{if(!cancelled)setPlaying(data===1);},
+          onReady:({target})=>{if(cancelled)return;player.current=target;target.setVolume(volumeRef.current*100);setReady(true);if(!preview && !document.hidden)target.playVideo();},
+          onStateChange:({data})=>{if(cancelled)return;if(data===1 && document.hidden){player.current?.pauseVideo();setPlaying(false);}else setPlaying(data===1);},
           onError:()=>{if(!cancelled){setPlaying(false);setError("Lagu YouTube tidak bisa diputar. Coba pilih lagu lain.");}},
           onAutoplayBlocked:()=>{if(!cancelled)setPlaying(false);},
         },
@@ -51,9 +59,9 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
     return ()=>{cancelled=true;instance?.destroy();player.current=null;};
   },[id,loop,preview]);
   function toggle() { if(playing)player.current?.pauseVideo();else player.current?.playVideo(); }
-  return <div className={preview?"text-stone-800 font-sans":"fixed bottom-5 left-5 z-40 max-w-[230px] text-white font-sans"}>
+  return <div className={preview?"text-stone-800 font-sans":"fixed bottom-5 right-5 z-40 max-w-[230px] text-white font-sans"}>
     <div ref={container} aria-hidden="true" inert className="pointer-events-none fixed -left-[10000px] top-0 h-[200px] w-[200px] opacity-0" />
-    <button type="button" disabled={!ready || !!error} onClick={toggle} aria-label={playing?"Jeda musik":"Putar musik"} aria-pressed={playing} className="flex items-center gap-2 rounded-full border border-white/25 bg-black/80 px-4 py-3 text-xs text-white shadow-lg disabled:opacity-60"><span aria-hidden="true">{playing?"Ⅱ":"▶"}</span><span className="max-w-40 truncate">{ready ? title || "Musik undangan" : error ? "Musik tidak tersedia" : "Memuat musik…"}</span></button>
-    {error && <p role="status" className="mt-2 rounded bg-black/80 p-2 text-xs text-white">{error}</p>}
+    <button type="button" disabled={!ready || !!error} onClick={toggle} aria-label={error || (!ready ? "Memuat musik" : playing ? "Jeda musik" : "Putar musik")} title={error || title || "Musik undangan"} aria-pressed={playing} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/80 text-white shadow-lg disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><MusicIcon playing={playing} /></button>
+    {error && <p role="status" className={preview ? "mt-2 text-xs" : "sr-only"}>{error}</p>}
   </div>;
 }

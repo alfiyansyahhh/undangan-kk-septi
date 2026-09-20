@@ -1,3 +1,29 @@
+# Turso / Vercel
+
+Aplikasi sekarang memakai Turso bila environment berikut tersedia (server-only):
+
+```env
+undangan_TURSO_DATABASE_URL=libsql://database-anda.turso.io
+undangan_TURSO_AUTH_TOKEN=token-anda
+ADMIN_PASSWORD=password-admin
+```
+
+Nama tanpa awalan `undangan_` (`TURSO_DATABASE_URL` dan `TURSO_AUTH_TOKEN`) juga didukung. Isi di Vercel → Project Settings → Environment Variables untuk Production, lalu redeploy. `.env.local` hanya berlaku untuk laptop dan tidak diunggah lewat Git.
+
+Tanpa URL Turso, mode lokal memakai file SQLite lama. Di Vercel aplikasi menolak fallback SQLite agar tidak menyimpan data di disk sementara. Semua akses SQL sekarang asynchronous, termasuk sesi admin, tamu, RSVP, dan salinan foto.
+
+- `npm run db:check`: memeriksa koneksi dan jumlah data lokal tanpa menampilkan rahasia.
+- `npm run db:migrate`: membuat backup lokal, menyalin data ke Turso, dan memverifikasi nilainya. Jalankan sebelum memakai deployment baru. Tidak menimpa undangan tujuan yang berbeda; SQLite asli tetap disimpan. Sesi login lama tidak dipindahkan.
+- `npm run db:backup`: backup **SQLite lokal saja**, bukan Turso. Gunakan fasilitas backup/export Turso untuk database remote.
+
+Foto salinan berada di tabel `local_photos` database aktif. Label lokal berarti salinan terpisah dari Drive; saat memakai Turso, gambar tersimpan di Turso, bukan filesystem Vercel. Foto besar masih dibatasi ukuran request/response layanan hosting; gunakan penyimpanan objek khusus untuk koleksi besar.
+
+Token yang pernah dikirim ke chat perlu dirotasi di Turso dan diperbarui di kedua environment.
+
+---
+
+## Catatan mode SQLite lokal (tanpa URL Turso)
+
 # Penyimpanan undangan
 
 Aplikasi memakai SQLite bawaan Node.js. Jalankan dengan Node.js 24 LTS atau lebih baru. Tidak perlu server MongoDB atau MySQL.
@@ -21,7 +47,7 @@ Ucapan baru tersimpan lewat `/api/wishes` dan dapat dibaca pengunjung lain. Sali
 
 SQLite memerlukan disk persisten. Pada VPS/container, arahkan `DATABASE_PATH` ke volume permanen di luar folder release, misalnya `/var/lib/undangan/invitation.sqlite`, dan beri proses Node izin menulis folder tersebut. Gunakan satu instance aplikasi pada volume lokal itu.
 
-**Jangan menyimpan database ini di filesystem sementara Vercel/serverless**: file lokal bisa hilang saat deployment/instance berganti. Untuk hosting tersebut gunakan database eksternal (misalnya MongoDB Atlas atau layanan SQLite eksternal); adapter aplikasi ini saat ini memakai SQLite lokal.
+**Jangan menyimpan database ini di filesystem sementara Vercel/serverless**: file lokal bisa hilang saat deployment/instance berganti. Untuk hosting tersebut gunakan database eksternal (misalnya MongoDB Atlas atau layanan SQLite eksternal); adapter aplikasi sekarang mendukung Turso lewat environment di atas.
 
 ```sh
 npm run db:backup
@@ -44,3 +70,9 @@ npm run build
 ```
 
 Tes memakai database sementara, menguji migrasi awal, persistensi lintas proses, validasi, pengaturan section, import foto, dan simpan/hapus ucapan. Database undangan asli tidak disentuh oleh tes.
+
+## Salinan foto lokal
+
+Tombol **Simpan undangan & foto ke lokal** menyimpan pengaturan saat ini, kemudian menyalin foto Google Drive yang dipakai. Foto disimpan sebagai BLOB di tabel `local_photos` SQLite dan disajikan melalui `/api/media/[id]`. GET undangan publik otomatis memakai salinan lokal; admin tetap memakai referensi Drive untuk memilih foto. Foto gagal diunduh tetap memakai Drive dan dapat dicoba ulang; foto yang sudah tersimpan dilewati.
+
+Salinan memakai gambar Drive hingga lebar 2400 piksel, bukan jaminan file asli. Batas 15 MB per gambar. Gambar perlu bisa diakses saat disalin. Setelah berhasil, tamu tidak membutuhkan akses Drive untuk foto tersebut. Backup database juga mencakup gambar sehingga ukuran backup bertambah. Disk server tetap harus persisten.

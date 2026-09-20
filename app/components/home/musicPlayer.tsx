@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { youtubeVideoId } from "@/lib/youtube";
+import MusicIcon from "./musicIcon";
 import YouTubeMusic from "./youtubeMusic";
 import type { InvitationData } from "@/lib/gdrive";
 export default function MusicPlayer({music,isOpen}: {music:InvitationData["music"];isOpen:boolean}) {
@@ -17,10 +18,17 @@ export default function MusicPlayer({music,isOpen}: {music:InvitationData["music
   useEffect(()=> {
     const player = audio.current;
     if (!player) return;
-    if (isOpen && enabled) void player.play().catch(()=>{/* Browser may require a tap on the play button. */});
+    if (isOpen && enabled && !document.hidden) void player.play().catch(()=>{/* Browser may require a tap on the play button. */});
     else player.pause();
     return ()=>player.pause();
   },[isOpen,enabled,music?.url,youtubeId]);
+  useEffect(() => {
+    const pause = () => audio.current?.pause();
+    const onVisibility = () => { if (document.hidden) pause(); };
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", pause);
+    return () => { document.removeEventListener("visibilitychange", onVisibility); window.removeEventListener("pagehide", pause); };
+  }, []);
   if (!enabled) return null;
   if (youtubeId) return isOpen ? <YouTubeMusic key={`${youtubeId}-${music!.loop}`} id={youtubeId} title={music!.title} loop={music!.loop} volume={music!.volume} /> : null;
   async function toggle() {
@@ -33,10 +41,10 @@ export default function MusicPlayer({music,isOpen}: {music:InvitationData["music
     }
   }
   return <>
-    <audio ref={audio} src={music!.url} loop={music!.loop} preload="none" onPlay={()=>setPlaying(true)} onPause={()=>setPlaying(false)} onEnded={()=>setPlaying(false)} onError={()=>{setPlaying(false);setError("Lagu tidak dapat dimuat.");}} />
-    {isOpen && <div className="fixed bottom-5 left-5 z-40 max-w-[230px] font-sans">
-      <button type="button" onClick={toggle} aria-label={playing?"Jeda musik":"Putar musik"} aria-pressed={playing} className="flex items-center gap-2 rounded-full border border-white/25 bg-black/75 px-4 py-3 text-xs text-white shadow-lg backdrop-blur-md"><span aria-hidden="true">{playing?"Ⅱ":"▶"}</span><span className="max-w-40 truncate">{music?.title || "Musik undangan"}</span></button>
-      {error && <p role="status" className="mt-2 rounded bg-black/80 p-2 text-xs text-white">{error}</p>}
+    <audio ref={audio} src={music!.url} loop={music!.loop} preload="none" onPlay={()=>{if(document.hidden)audio.current?.pause();else setPlaying(true);}} onPause={()=>setPlaying(false)} onEnded={()=>setPlaying(false)} onError={()=>{setPlaying(false);setError("Lagu tidak dapat dimuat.");}} />
+    {isOpen && <div className="fixed bottom-5 right-5 z-40 max-w-[230px] font-sans">
+      <button type="button" onClick={toggle} aria-label={error || (playing?"Jeda musik":"Putar musik")} title={error || (playing?"Jeda musik":"Putar musik")} aria-pressed={playing} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/75 text-white shadow-lg backdrop-blur-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><MusicIcon playing={playing} /></button>
+      {error && <p role="status" className="sr-only">{error}</p>}
     </div>}
   </>;
 }

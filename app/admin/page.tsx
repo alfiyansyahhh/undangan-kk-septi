@@ -6,5 +6,5 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   const cookieStore = await cookies();
-  return validSession(cookieStore.get(ADMIN_COOKIE)?.value) ? <AdminDashboard /> : <AdminLogin />;
+  return await validSession(cookieStore.get(ADMIN_COOKIE)?.value) ? <AdminDashboard /> : <AdminLogin />;
 }

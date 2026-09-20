@@ -8,8 +8,9 @@ export default function AdminLogin() {
     event.preventDefault(); setBusy(true); setError("");
     try {
       const response = await fetch("/api/admin/session", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({password}) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.message);
+      const result = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(result?.message || `Server gagal merespons (HTTP ${response.status}). Periksa log deployment dan koneksi database.`);
+      if (!result?.success) throw new Error("Respons login tidak valid. Silakan coba lagi.");
       window.location.reload();
     } catch (error) { setError(error instanceof Error ? error.message : "Gagal login. Coba lagi."); setBusy(false); }
   }

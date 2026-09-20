@@ -9,20 +9,20 @@ test('SQLite seeds once and preserves invitation, photos and wishes across proce
   const dir = mkdtempSync(path.join(tmpdir(), 'invitation-db-'));
   const run = code => {
     const result = spawnSync(process.execPath, ['--experimental-strip-types', '--input-type=module', '-e', code], {
-      cwd: process.cwd(), encoding: 'utf8', env: { ...process.env, DATABASE_PATH: path.join(dir, 'test.sqlite') },
+      cwd: process.cwd(), encoding: 'utf8', env: { ...process.env, TURSO_DATABASE_URL:'', undangan_TURSO_DATABASE_URL:'', VERCEL:'', DATABASE_PATH: path.join(dir, 'test.sqlite') },
     });
     assert.equal(result.status, 0, result.stderr);
   };
   try {
     run(`import { readInvitation, saveInvitation, savePhotos, database } from './lib/database.ts';
-      const data = readInvitation(); data.couple.title = 'Persistence test'; data.photos.gift = 'chosen-photo';
-      saveInvitation(data); savePhotos([{ id:'test-photo', name:'Test', thumbnail:'https://example.com/test.jpg', full:'https://example.com/test.jpg' }]);
-      database().prepare('INSERT INTO wishes VALUES (?, ?, ?)').run('test-wish', JSON.stringify({name:'Test guest'}), new Date().toISOString());`);
+      const data = await readInvitation(); data.couple.title = 'Persistence test'; data.photos.gift = 'chosen-photo';
+      await saveInvitation(data); await savePhotos([{ id:'test-photo', name:'Test', thumbnail:'https://example.com/test.jpg', full:'https://example.com/test.jpg' }]);
+      await database().prepare('INSERT INTO wishes VALUES (?, ?, ?)').run('test-wish', JSON.stringify({name:'Test guest'}), new Date().toISOString());`);
     run(`import assert from 'node:assert/strict'; import { readInvitation, readPhotos, database } from './lib/database.ts';
-      assert.equal(readInvitation().couple.title, 'Persistence test');
-      assert.equal(readInvitation().photos.gift, 'chosen-photo');
-      assert.ok(readPhotos().some(p => p.id === 'test-photo'));
-      assert.equal(JSON.parse(database().prepare('SELECT value FROM wishes WHERE id = ?').get('test-wish').value).name, 'Test guest');`);
+      assert.equal((await readInvitation()).couple.title, 'Persistence test');
+      assert.equal((await readInvitation()).photos.gift, 'chosen-photo');
+      assert.ok((await readPhotos()).some(p => p.id === 'test-photo'));
+      assert.equal(JSON.parse((await database().prepare('SELECT value FROM wishes WHERE id = ?').get('test-wish')).value).name, 'Test guest');`);
   } finally { rmSync(dir, { recursive:true, force:true }); }
 });
 
@@ -49,7 +49,7 @@ test('API saves section settings, imports photos, persists wishes and rejects ma
       registerHooks({ resolve(specifier, context, next) {
         if (specifier.startsWith('@/')) return { url:pathToFileURL(path.resolve(specifier.slice(2) + '.ts')).href, shortCircuit:true };
         if (specifier === 'next/server') return next('next/server.js',context);
-        if (specifier === './database') return next('./database.ts',context);
+        if (specifier === './database' || specifier === './gdrive') return next(specifier+'.ts',context);
         return next(specifier, context);
       }});
       const invitation = await import('./app/api/invitation/route.ts');
@@ -66,8 +66,8 @@ test('API saves section settings, imports photos, persists wishes and rejects ma
       const cookie = loggedIn.headers.get('set-cookie').split(';')[0];
       assert.ok(loggedIn.headers.get('set-cookie').includes('HttpOnly'));
       const token = cookie.split('=')[1];
-      assert.ok(auth.validSession(token));
-      assert.equal(auth.validSession(token.slice(0,-1)+'z'),false);
+      assert.ok(await auth.validSession(token));
+      assert.equal(await auth.validSession(token.slice(0,-1)+'z'),false);
       const headers = {'Content-Type':'application/json',origin:'http://localhost',cookie};
       const request = (body) => new Request('http://localhost/api', {method:'POST',headers,body:JSON.stringify(body)});
       const publicRequest = new Request('http://localhost/api');
@@ -76,12 +76,31 @@ test('API saves section settings, imports photos, persists wishes and rejects ma
       assert.equal((await photos.POST(new Request('http://localhost/api',{method:'POST'}))).status,401);
       assert.equal((await wishes.DELETE(new Request('http://localhost/api',{method:'DELETE'}))).status,401);
       assert.equal((await invitation.POST(new Request('http://localhost/api',{method:'POST',headers:{cookie,origin:'https://other.example'},body:'{}'}))).status,403);
-      const data = await (await invitation.GET()).json();
+      const data = await (await invitation.GET(new Request('http://localhost/api/invitation'))).json();
       data.photos.akad = 'test-photo'; data.sections = { galleryTitle:'Custom gallery' };
       assert.equal((await invitation.POST(request(data))).status,200);
-      assert.equal((await (await invitation.GET()).json()).photos.akad,'test-photo');
+      assert.equal((await (await invitation.GET(new Request('http://localhost/api/invitation'))).json()).photos.akad,'test-photo');
       assert.equal((await invitation.POST(request({}))).status,400);
-      assert.equal((await (await invitation.GET()).json()).sections.galleryTitle,'Custom gallery');
+      const local = await import('./lib/localPhotos.ts');
+      const localRoute = await import('./app/api/photos/local/route.ts');
+      assert.equal((await localRoute.POST(new Request('http://localhost/api/photos/local',{method:'POST'}))).status,401);
+      const imageId = 'local_image_identifier_123456789';
+      const jpeg = Buffer.from([255,216,255,224]);
+      assert.equal(local.imageMime(jpeg),'image/jpeg');
+      assert.equal(local.imageMime(Buffer.from('<html>login</html>')),null);
+      await local.localPhotoDatabase().prepare('INSERT INTO local_photos VALUES (?, ?, ?)').run(imageId,'image/jpeg',jpeg);
+      data.photos.gift = imageId;
+      assert.equal((await invitation.POST(request(data))).status,200);
+      const publicData = await (await invitation.GET(new Request('http://localhost/api/invitation'))).json();
+      assert.equal(publicData.photos.gift,'/api/media/'+imageId);
+      const adminData = await (await invitation.GET(new Request('http://localhost/api/invitation?edit=1',{headers}))).json();
+      assert.equal(adminData.photos.gift,imageId);
+      const media = await import('./app/api/media/[id]/route.ts');
+      const imageResponse = await media.GET(new Request('http://localhost/api/media/'+imageId),{params:Promise.resolve({id:imageId})});
+      assert.equal(imageResponse.headers.get('content-type'),'image/jpeg');
+      assert.deepEqual(Buffer.from(await imageResponse.arrayBuffer()),jpeg);
+
+      assert.equal((await (await invitation.GET(new Request('http://localhost/api/invitation'))).json()).sections.galleryTitle,'Custom gallery');
       assert.equal((await photos.POST(request({photos:[{}]}))).status,400);
       const photoId = 'valid_photo_identifier_123456789';
       assert.equal((await photos.POST(request({photos:[{id:photoId,name:'Test'}]}))).status,200);
@@ -108,13 +127,13 @@ test('API saves section settings, imports photos, persists wishes and rejects ma
       assert.equal((await wishes.DELETE(new Request('http://localhost/api/wishes?id='+savedWish.id,{method:'DELETE',headers}))).status,200);
       assert.equal((await (await wishes.GET()).json()).length,0);
       assert.equal((await login.DELETE(new Request('http://localhost/api/admin/session',{method:'DELETE',headers}))).status,200);
-      assert.equal(auth.validSession(token),false);
-      const second = auth.createSession();
+      assert.equal(await auth.validSession(token),false);
+      const second = await auth.createSession();
       process.env.ADMIN_PASSWORD = 'new-password';
-      assert.equal(auth.validSession(second),false);
+      assert.equal(await auth.validSession(second),false);
       delete process.env.ADMIN_PASSWORD;
       assert.equal((await login.POST(loginRequest('anything'))).status,503);
-    `], { encoding:'utf8', env:{...process.env,DATABASE_PATH:path.join(dir,'test.sqlite')} });
+    `], { encoding:'utf8', env:{...process.env,TURSO_DATABASE_URL:'',undangan_TURSO_DATABASE_URL:'',VERCEL:'',DATABASE_PATH:path.join(dir,'test.sqlite')} });
     assert.equal(result.status,0,result.stderr);
   } finally { rmSync(dir,{recursive:true,force:true}); }
 });

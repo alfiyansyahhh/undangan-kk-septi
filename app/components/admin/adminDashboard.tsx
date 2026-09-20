@@ -18,6 +18,8 @@ export default function AdminPage() {
   const [data, setData] = useState<InvitationData | null>(null);
   const [photos, setPhotos] = useState<GDrivePhoto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [localProgress, setLocalProgress] = useState<string | null>(null);
+  const [localReport, setLocalReport] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
   const [activeTab, setActiveTab] = useState<"photos" | "info" | "sections" | "wishes" | "share" | "music">("photos");
@@ -28,7 +30,7 @@ export default function AdminPage() {
     async function loadData() {
       try {
         const [resData, resPhotos] = await Promise.all([
-          fetch("/api/invitation"),
+          fetch("/api/invitation?edit=1"),
           fetch("/api/photos"),
         ]);
         if (!resData.ok || !resPhotos.ok) throw new Error("Gagal memuat database");
@@ -68,6 +70,28 @@ export default function AdminPage() {
       setSaving(false);
       setTimeout(() => setSaveMessage(null), 4000);
     }
+  };
+
+  const saveLocalPhotos = async () => {
+    if (!data || localProgress !== null) return;
+    setLocalProgress("Menyimpan undangan…"); setLocalReport("");
+    try {
+      const save = await fetch("/api/invitation", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+      if (!save.ok) throw new Error("Gagal menyimpan undangan. Periksa sesi login dan data.");
+      const sources = [data.couple.bride.photo,data.couple.groom.photo,data.photos.cover,data.photos.akad,data.photos.resepsi,data.photos.gift,data.photos.galleryCover,...data.photos.gallery,...(data.photos.coverSlides||[]),...(data.photos.quoteSlides||[]),...(data.story||[]).map(item=>item.image)];
+      const ids = [...new Set(sources.filter((src): src is string=>!!src).map(extractDriveId).filter((id): id is string=>!!id))];
+      const failed:string[]=[];let done=0;
+      for (const id of ids) {
+        setLocalProgress(`Menyalin foto ${++done}/${ids.length}…`);
+        try {
+          const response = await fetch("/api/photos/local",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})});
+          const result = await response.json();
+          if(!response.ok)throw new Error(result.message);
+        } catch(error) { failed.push(`${id}: ${error instanceof Error?error.message:"Gagal diunduh"}`); }
+      }
+      setLocalReport(`${ids.length-failed.length}/${ids.length} foto tersedia lokal. Foto yang gagal tetap memakai Drive. ${failed.join("; ")}`);
+    } catch(error) { setLocalReport(error instanceof Error?error.message:"Gagal menyalin foto"); }
+    finally { setLocalProgress(null); }
   };
 
   // Set Cover Photo
@@ -362,7 +386,7 @@ export default function AdminPage() {
             </Link>
             <button
               onClick={handleSave}
-              disabled={saving}
+              disabled={saving || localProgress !== null}
               className="px-4 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold text-sm shadow-sm transition flex items-center gap-1.5 disabled:opacity-50"
             >
               {saving ? "Menyimpan..." : "💾 Simpan Perubahan"}
@@ -371,6 +395,11 @@ export default function AdminPage() {
         </div>
       </header>
 
+      <div className="mx-auto max-w-6xl px-4 pt-4">
+        <button type="button" disabled={saving || localProgress !== null} onClick={saveLocalPhotos} className="rounded-lg bg-stone-800 px-4 py-2 text-sm text-white disabled:opacity-50">{localProgress || "Simpan undangan & foto ke lokal"}</button>
+        <p className="mt-2 text-xs text-stone-500">Menyalin foto yang dipakai undangan ke server. Pemilihan foto tetap dari Google Drive.</p>
+        {localReport && <p role="status" className="mt-2 break-words text-sm">{localReport}</p>}
+      </div>
       {/* Floating Save Alert */}
       {saveMessage && (
         <div
