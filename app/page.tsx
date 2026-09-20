@@ -21,7 +21,20 @@ import GlobalBackground from "./components/home/globalBackground";
 
 function InvitationContent() {
   const searchParams = useSearchParams();
-  const guestName = searchParams.get("to") || searchParams.get("u") || "Tamu Undangan";
+  const guestToken = searchParams.get("guest") || "";
+  const [resolvedGuest, setResolvedGuest] = useState<{token:string;name:string} | null>(null);
+  const verifiedName = resolvedGuest?.token === guestToken ? resolvedGuest.name : "";
+  const guestName = verifiedName || "Tamu Undangan";
+  useEffect(() => {
+    if (!guestToken) return;
+    const controller = new AbortController();
+    fetch(`/api/guest?guest=${encodeURIComponent(guestToken)}`, {signal:controller.signal}).then(async res => {
+      if (!res.ok) throw new Error("Link tamu tidak valid");
+      const guest = await res.json();
+      if (!controller.signal.aborted) setResolvedGuest({token:guestToken,name:guest.name});
+    }).catch(() => {});
+    return () => controller.abort();
+  }, [guestToken]);
 
   const [data, setData] = useState<InvitationData>(defaultData as InvitationData);
   const [isOpen, setIsOpen] = useState(false);
@@ -56,24 +69,6 @@ function InvitationContent() {
 
     async function loadWishes() {
       try {
-        // Keep the original browser backup; migrate it once, with idempotent IDs.
-        try {
-        const legacy = localStorage.getItem("wedding_wishes_meila_arif");
-        if (legacy && !localStorage.getItem("wedding_wishes_sqlite_migrated")) {
-          const old: unknown = JSON.parse(legacy);
-          if (Array.isArray(old)) {
-            for (const item of old) {
-              if (!item || typeof item.name !== "string" || typeof item.message !== "string") continue;
-              const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify([item.id, item.name, item.message, item.time])));
-              const hash = Array.from(new Uint8Array(bytes), b => b.toString(16).padStart(2, "0")).join("");
-              const id = `${hash.slice(0,8)}-${hash.slice(8,12)}-${hash.slice(12,16)}-${hash.slice(16,20)}-${hash.slice(20,32)}`;
-              const migrated = await fetch("/api/wishes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...item, id }) });
-              if (!migrated.ok) throw new Error("Ucapan lama belum berhasil dipindahkan");
-            }
-            localStorage.setItem("wedding_wishes_sqlite_migrated", "true");
-          }
-        }
-        } catch (error) { console.error("Migrasi ucapan lokal tertunda:", error); }
         const res = await fetch("/api/wishes", { cache: "no-store" });
         if (!res.ok) throw new Error("Gagal memuat ucapan");
         setWishes(await res.json());
@@ -122,7 +117,7 @@ function InvitationContent() {
   const handleAddWish = async (wishData: Omit<Wish, "id" | "time">) => {
     const response = await fetch("/api/wishes", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...wishData, id: crypto.randomUUID() }),
+      body: JSON.stringify({ ...wishData, guestToken, id: crypto.randomUUID() }),
     });
     if (!response.ok) throw new Error("Gagal menyimpan ucapan");
     const saved: Wish = await response.json();
@@ -133,15 +128,19 @@ function InvitationContent() {
 
   const coverUrl = getDriveThumbnailUrl(data.photos.cover || "1uwgIpksRY4BUmCPb1LtoNW3jtY2COuzI", 1200);
 
+  const slideshowPhotos = data.photos.coverSlides?.length
+    ? data.photos.coverSlides
+    : data.photos.gallery.length ? data.photos.gallery : [coverUrl];
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative font-sans">
      
-     <GlobalBackground photos={data.photos.background?.length ? data.photos.background : data.photos.gallery.length ? data.photos.gallery : [coverUrl]} />
+     <GlobalBackground photos={slideshowPhotos} />
 
       {/* 1. COVER SCREEN */}
       <CoverSection
         isOpen={isOpen}
-        coverPhotos={data.photos.coverSlides?.length ? data.photos.coverSlides : data.photos.gallery.length ? data.photos.gallery : [coverUrl]}
+        coverPhotos={slideshowPhotos}
         brideShortName={data.couple.bride.shortName}
         groomShortName={data.couple.groom.shortName}
         displayDate={data.events.displayDate}
@@ -226,17 +225,17 @@ function InvitationContent() {
             />
 
             {/* Gift Section */}
-            <GiftSection
+            {/* <GiftSection
               title={data.sections?.giftTitle}
               description={data.sections?.giftDescription}
               gifts={data.gifts}
               coverUrl={getDriveThumbnailUrl(data.photos.gift || coverUrl)}
               onCopy={handleCopyAccount}
               copiedBank={copiedBank}
-            />
+            /> */}
 
             {/* Wish / Ucapan Section */}
-            <WishSection title={data.sections?.wishTitle} description={data.sections?.wishDescription} wishes={wishes} onSubmitWish={handleAddWish} />
+            <WishSection guestName={verifiedName} title={data.sections?.wishTitle} description={data.sections?.wishDescription} wishes={wishes} onSubmitWish={handleAddWish} />
 
             {/* Footer Section */}
             <FooterSection

@@ -1,13 +1,18 @@
+import { requireAdmin } from "@/lib/adminAuth";
 import { NextResponse } from "next/server";
 import { readPhotos, savePhotos } from "@/lib/database";
 import { getDriveFullUrl, getDriveThumbnailUrl } from "@/lib/gdrive";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export async function GET() {
+export async function GET(request: Request) {
+  const denied = requireAdmin(request);
+  if (denied) return denied;
   try { return NextResponse.json(readPhotos(), { headers: { "Cache-Control": "no-store" } }); }
   catch (error) { console.error(error); return NextResponse.json({ message: "Gagal membaca foto" }, { status: 500 }); }
 }
 export async function POST(request: Request) {
+  const denied = requireAdmin(request);
+  if (denied) return denied;
   let body;
   try { body = await request.json(); } catch { return NextResponse.json({ message: "JSON tidak valid" }, { status: 400 }); }
   if (!Array.isArray(body?.photos) || !body.photos.length || !body.photos.every((p: { id?: unknown; name?: unknown }) => p && typeof p.id === "string" && /^[\w-]{20,100}$/.test(p.id) && (p.name === undefined || typeof p.name === "string"))) {

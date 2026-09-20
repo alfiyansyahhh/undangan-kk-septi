@@ -3,7 +3,7 @@
 import { revealMotion } from "./revealMotion";
 import { motion } from "framer-motion";
 
-import Link from "next/link";
+
 
 interface FooterSectionProps {
   text?: string;
@@ -33,16 +33,6 @@ export default function FooterSection({
         </motion.p>
       </footer>
 
-      {/* Floating Admin Button */}
-      <div className="fixed bottom-4 right-4 z-40">
-        <Link
-          href="/admin"
-          className="px-3.5 py-2 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-medium shadow-lg backdrop-blur-sm flex items-center gap-1.5 transition border border-white/10"
-        >
-          <span>⚙️</span>
-          <span>Edit di Admin</span>
-        </Link>
-      </div>
     </>
   );
 }

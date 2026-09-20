@@ -39,10 +39,10 @@ export function database() {
 }
 export function readInvitation(): InvitationData {
   const row = database().prepare("SELECT value FROM documents WHERE name = ?").get("invitation")!;
-  return JSON.parse(String(row.value));
+  return unifySlideshow(JSON.parse(String(row.value)));
 }
 export function saveInvitation(data: InvitationData) {
-  database().prepare("UPDATE documents SET value = ? WHERE name = ?").run(JSON.stringify(data), "invitation");
+  database().prepare("UPDATE documents SET value = ? WHERE name = ?").run(JSON.stringify(unifySlideshow(data)), "invitation");
 }
 export function readPhotos(): GDrivePhoto[] {
   return database().prepare("SELECT value FROM photos ORDER BY rowid").all().map(row => JSON.parse(String(row.value)));
@@ -55,4 +55,10 @@ export function savePhotos(photos: GDrivePhoto[]) {
     for (const photo of photos) insert.run(photo.id, JSON.stringify(photo));
     db.exec("COMMIT");
   } catch (error) { db.exec("ROLLBACK"); throw error; }
+}
+
+/** Cover is canonical; fall back to the old background selection for legacy data. */
+export function unifySlideshow(data: InvitationData): InvitationData {
+  const { background, ...photos } = data.photos;
+  return { ...data, photos: { ...photos, coverSlides: photos.coverSlides ?? background ?? [] } };
 }

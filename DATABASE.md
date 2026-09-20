@@ -13,9 +13,9 @@ npm install
 npm run dev
 ```
 
-Buka `/admin`. Tab **Section, Foto & Cerita** mengatur foto independen untuk cover, background, slider kutipan, akad, resepsi, gift, foto utama galeri, serta foto tiap cerita. Pemilihan slideshow bisa diurutkan. Tab data mempelai mengatur kutipan, jadwal, nama dan rekening. Klik **Simpan Perubahan** setelah mengedit undangan. Import foto dan moderasi buku tamu langsung disimpan.
+Buka `/admin`. Tab **Section, Foto & Cerita** mengatur satu slideshow bersama untuk cover dan background/hero, serta foto independen untuk slider kutipan, akad, resepsi, gift, foto utama galeri, serta foto tiap cerita. Pemilihan slideshow bisa diurutkan. Tab data mempelai mengatur kutipan, jadwal, nama dan rekening. Klik **Simpan Perubahan** setelah mengedit undangan. Import foto dan moderasi buku tamu langsung disimpan.
 
-Ucapan baru tersimpan lewat `/api/wishes` dan dapat dibaca pengunjung lain. Ucapan lama di localStorage dipindahkan saat browser pemilik membukanya kembali; salinan lokal tetap dipertahankan.
+Ucapan baru tersimpan lewat `/api/wishes` dan dapat dibaca pengunjung lain. Salinan ucapan lama di localStorage tetap dipertahankan; impor otomatis publik dinonaktifkan karena RSVP sekarang memerlukan token tamu valid.
 
 ## Deployment dan backup
 
@@ -31,7 +31,9 @@ npm run db:backup -- /lokasi-backup/undangan.sqlite
 
 Backup memakai API SQLite sehingga aman ketika database aktif dalam mode WAL. Simpan backup di lokasi lain secara berkala. Untuk restore, hentikan aplikasi, simpan salinan database lama beserta berkas `-wal`/`-shm` jika ada, lalu gunakan file backup sebagai `DATABASE_PATH` baru. Jangan menimpa database yang sedang aktif.
 
-Panel admin dan endpoint tulis undangan/foto/moderasi belum memiliki login, mengikuti aplikasi awal. Batasi akses `/admin`, POST `/api/invitation`, POST `/api/photos`, dan DELETE `/api/wishes` di reverse proxy sebelum dipublikasikan. GET publik dan POST ucapan perlu tetap dapat diakses tamu.
+Admin kini dilindungi password `ADMIN_PASSWORD` di `.env.local` (jangan commit file ini). Restart server setelah mengganti password. Sesi disimpan di SQLite selama 8 jam dengan cookie HttpOnly; perubahan password membatalkan sesi lama. Endpoint tulis undangan, pustaka foto, daftar tamu, dan hapus ucapan wajib login. Tombol Keluar mencabut sesi. Login dibatasi 10 percobaan per 15 menit.
+
+Panel **Bagikan Undangan** menerima daftar `Nama | Nomor WhatsApp`. Klik **Simpan tamu & buat link** untuk menyimpan token acak ke database. Daftar tersimpan tersedia saat admin dibuka kembali. Link memakai `?guest=token`; nama RSVP diambil dari database dan tidak bisa ditentukan lewat `?to=` atau payload form. Token salah/tanpa token tidak bisa mengirim RSVP. Link lama berbasis nama perlu dibuat ulang. Link personal tetap bisa diteruskan kepada orang lain, jadi token mengikat nama undangan, bukan membuktikan identitas orang yang membuka link.
 
 ## Pemeriksaan
 

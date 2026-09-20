@@ -14,6 +14,7 @@ export interface Wish {
 }
 
 interface WishSectionProps {
+  guestName: string;
   title?: string;
   description?: string;
   wishes: Wish[];
@@ -21,6 +22,7 @@ interface WishSectionProps {
 }
 
 export default function WishSection({
+  guestName,
   title,
   description, wishes, onSubmitWish }: WishSectionProps) {
   const [wishForm, setWishForm] = useState({
@@ -33,13 +35,13 @@ export default function WishSection({
   const [error, setError] = useState("");
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!wishForm.name || !wishForm.message) return;
+    if (!guestName || !wishForm.message) return;
 
     if (sending) return;
     setSending(true);
     setError("");
     try {
-      await onSubmitWish(wishForm);
+      await onSubmitWish({ ...wishForm, name:guestName });
       setWishForm({ name: "", attendance: "Hadir", message: "" });
     } catch { setError("Ucapan belum tersimpan. Silakan coba lagi."); }
     finally { setSending(false); }
@@ -59,6 +61,7 @@ export default function WishSection({
         </p>
       </motion.div>
 
+      {!guestName && <p role="status" className="text-center text-sm text-stone-300">Buka link undangan personal dari mempelai untuk mengisi RSVP.</p>}
       <motion.form {...revealMotion("fade", 0.1)}
         onSubmit={handleSubmit}
         className="relative space-y-6 rounded-2xl border border-[#c9a96e]/20 bg-gradient-to-b from-[#1c1914]/95 to-[#101010]/95 p-6 shadow-xl sm:p-7"
@@ -67,9 +70,10 @@ export default function WishSection({
           <label htmlFor="wish-name" className="mb-2 block text-[10px] font-medium uppercase tracking-[0.16em] text-[#d1bd97]">Nama Anda</label>
           <input
             id="wish-name"            type="text"
-            placeholder="Contoh: Budi Santoso"
+            placeholder="Buka link undangan personal Anda"
             required
-            value={wishForm.name}
+            value={guestName}
+            readOnly
             onChange={(e) => setWishForm({ ...wishForm, name: e.target.value })}
             className="w-full rounded-none border-0 border-b border-[#c9a96e]/25 bg-transparent px-0 py-3 font-sans text-base text-stone-100 placeholder-stone-500 transition-colors focus:border-[#ddc08a] focus:outline-none focus:ring-0 sm:text-sm"
           />
@@ -107,7 +111,7 @@ export default function WishSection({
 
         <button
           type="submit"
-          disabled={sending}
+          disabled={sending || !guestName}
           className="min-h-12 w-full cursor-pointer rounded-full border border-[#ddc08a]/40 bg-gradient-to-r from-[#c9a96e] to-[#b3945c] px-4 py-3 text-[11px] font-medium uppercase tracking-[0.16em] text-[#19150e] transition-colors hover:from-[#ddc08a] hover:to-[#c9a96e] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ddc08a]"
         >
           {sending ? "Menyimpan…" : "Kirim Ucapan & Doa"}

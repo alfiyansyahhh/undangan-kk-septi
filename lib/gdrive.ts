@@ -35,6 +35,7 @@ export interface InvitationData {
     coverId?: string;
     gallery: string[];
     coverSlides?: string[];
+    /** Legacy field, normalized to coverSlides when loaded/saved. */
     background?: string[];
     quoteSlides?: string[];
     akad?: string;
@@ -69,6 +70,7 @@ export interface InvitationData {
     desc: string;
   }>;
   sections?: {
+    shareTemplate?: string;
     galleryTitle?: string;
     galleryVideo?: string;
     storyTitle?: string;
