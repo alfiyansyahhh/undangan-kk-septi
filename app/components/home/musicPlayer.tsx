@@ -23,12 +23,28 @@ export default function MusicPlayer({music,isOpen}: {music:InvitationData["music
     return ()=>player.pause();
   },[isOpen,enabled,music?.url,youtubeId]);
   useEffect(() => {
-    const pause = () => audio.current?.pause();
-    const onVisibility = () => { if (document.hidden) pause(); };
+    let resumeOnReturn = false;
+    const pause = () => {
+      const player = audio.current;
+      if (!player) return;
+      resumeOnReturn = resumeOnReturn || (!player.paused && !player.ended);
+      player.pause();
+    };
+    const resume = () => {
+      if (document.hidden || !resumeOnReturn) return;
+      resumeOnReturn = false;
+      if (isOpen && enabled) void audio.current?.play().catch(() => setPlaying(false));
+    };
+    const onVisibility = () => { if (document.hidden) pause(); else resume(); };
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("pagehide", pause);
-    return () => { document.removeEventListener("visibilitychange", onVisibility); window.removeEventListener("pagehide", pause); };
-  }, []);
+    window.addEventListener("pageshow", resume);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", pause);
+      window.removeEventListener("pageshow", resume);
+    };
+  }, [isOpen, enabled, music?.url, youtubeId]);
   if (!enabled) return null;
   if (youtubeId) return isOpen ? <YouTubeMusic key={`${youtubeId}-${music!.loop}`} id={youtubeId} title={music!.title} loop={music!.loop} volume={music!.volume} /> : null;
   async function toggle() {

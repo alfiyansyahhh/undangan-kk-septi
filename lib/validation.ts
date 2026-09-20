@@ -14,6 +14,10 @@ export function validInvitation(value: unknown): value is InvitationData {
   if (value.sections !== undefined && (!object(value.sections) || !Object.values(value.sections).every(v => typeof v === "string"))) return false;
   if (value.story !== undefined && (!Array.isArray(value.story) || !value.story.every(v => fields(v, ["year", "title", "desc"]) && (v.image === undefined || typeof v.image === "string")))) return false;
   if (value.gifts !== undefined && (!Array.isArray(value.gifts) || !value.gifts.every(v => fields(v, ["bank", "number", "holder"])))) return false;
+  if (value.dressCode !== undefined) {
+    const d = value.dressCode;
+    if (!object(d) || typeof d.enabled !== "boolean" || !fields(d, ["title", "description"]) || !Array.isArray(d.colors) || d.colors.length < 1 || d.colors.length > 24 || !d.colors.every(c => fields(c, ["name", "hex"]) && /^#[0-9a-f]{6}$/i.test(c.hex))) return false;
+  }
   if (value.music !== undefined) {
     const m = value.music;
     if (!object(m) || typeof m.enabled !== "boolean" || typeof m.title !== "string" || typeof m.url !== "string" || typeof m.loop !== "boolean" || typeof m.volume !== "number" || !Number.isFinite(m.volume) || m.volume < 0 || m.volume > 1) return false;

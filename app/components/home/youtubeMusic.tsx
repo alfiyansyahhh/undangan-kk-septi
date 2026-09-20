@@ -28,17 +28,32 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
   const container=useRef<HTMLDivElement>(null);
   const player=useRef<Player | null>(null);
   const [playing,setPlaying]=useState(false);
+  const playingRef=useRef(false);
   const [ready,setReady]=useState(false);
   const [error,setError]=useState("");
   const volumeRef=useRef(volume);
   useEffect(()=>{volumeRef.current=volume;player.current?.setVolume(volume*100);},[volume]);
   useEffect(() => {
-    const pause = () => player.current?.pauseVideo();
-    const onVisibility = () => { if (document.hidden) pause(); };
+    let resumeOnReturn = false;
+    const pause = () => {
+      resumeOnReturn = resumeOnReturn || playingRef.current;
+      player.current?.pauseVideo();
+    };
+    const resume = () => {
+      if (document.hidden || !resumeOnReturn) return;
+      resumeOnReturn = false;
+      player.current?.playVideo();
+    };
+    const onVisibility = () => { if (document.hidden) pause(); else resume(); };
     document.addEventListener("visibilitychange", onVisibility);
     window.addEventListener("pagehide", pause);
-    return () => { document.removeEventListener("visibilitychange", onVisibility); window.removeEventListener("pagehide", pause); };
-  }, []);
+    window.addEventListener("pageshow", resume);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", pause);
+      window.removeEventListener("pageshow", resume);
+    };
+  }, [id, loop, preview]);
   useEffect(()=> {
     let cancelled=false;
     let instance:Player | undefined;
@@ -50,13 +65,13 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
         playerVars:{playsinline:1,controls:0,origin:window.location.origin,loop:loop?1:0,playlist:loop?id:""},
         events:{
           onReady:({target})=>{if(cancelled)return;player.current=target;target.setVolume(volumeRef.current*100);setReady(true);if(!preview && !document.hidden)target.playVideo();},
-          onStateChange:({data})=>{if(cancelled)return;if(data===1 && document.hidden){player.current?.pauseVideo();setPlaying(false);}else setPlaying(data===1);},
+          onStateChange:({data})=>{if(cancelled)return;playingRef.current=data===1;if(data===1 && document.hidden){player.current?.pauseVideo();setPlaying(false);}else setPlaying(data===1);},
           onError:()=>{if(!cancelled){setPlaying(false);setError("Lagu YouTube tidak bisa diputar. Coba pilih lagu lain.");}},
           onAutoplayBlocked:()=>{if(!cancelled)setPlaying(false);},
         },
       });
     }).catch(()=>{if(!cancelled)setError("Gagal memuat musik. Muat ulang untuk mencoba lagi.");});
-    return ()=>{cancelled=true;instance?.destroy();player.current=null;};
+    return ()=>{cancelled=true;instance?.destroy();player.current=null;playingRef.current=false;};
   },[id,loop,preview]);
   function toggle() { if(playing)player.current?.pauseVideo();else player.current?.playVideo(); }
   return <div className={preview?"text-stone-800 font-sans":"fixed bottom-5 right-5 z-40 max-w-[230px] text-white font-sans"}>

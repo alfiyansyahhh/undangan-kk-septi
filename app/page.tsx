@@ -1,4 +1,5 @@
 "use client";
+import DressCodeSection from "./components/home/dressCodeSection";
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -215,6 +216,8 @@ function InvitationContent() {
               photoResepsi={data.photos.resepsi || data.photos.cover}
               events={data.events} 
             />
+
+            <DressCodeSection settings={data.dressCode} />
 
             {/* Gallery Grid Masonry */}
             <GallerySection gallery={data.photos.gallery} coverPhoto={data.photos.galleryCover} videoUrl={data.sections?.galleryVideo} title={data.sections?.galleryTitle} />

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { GDrivePhoto, InvitationData } from "@/lib/gdrive";
+import { defaultDressCode } from "@/lib/dressCode";
 import { getDriveThumbnailUrl } from "@/lib/gdrive";
 
 const input = "mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm";
@@ -62,6 +63,8 @@ function PhotoPicker({ label, value, photos, onChange, multiple = false }: { lab
 export default function SectionEditor({ data, photos, onChange }: { data: InvitationData; photos: GDrivePhoto[]; onChange: (data: InvitationData) => void }) {
   const section = (key: keyof NonNullable<InvitationData["sections"]>, value: string) => onChange({ ...data, sections: { ...data.sections, [key]: value } });
   const story = data.story || [];
+  const dressCode = data.dressCode ?? defaultDressCode;
+  const updateDressCode = (patch: Partial<typeof dressCode>) => onChange({ ...data, dressCode: { ...dressCode, ...patch } });
   return <div className="space-y-6">
     <section className="rounded-xl bg-white border p-5 space-y-4"><h2 className="font-bold">Foto per section</h2><p className="text-sm text-stone-500">Pilih dari pustaka foto. Foto tetap tersedia untuk galeri; pilihan section disimpan terpisah. Untuk slideshow, urutan pilihan menjadi urutan tampil.</p>
       <div className="grid items-start md:grid-cols-2 gap-4">
@@ -75,6 +78,21 @@ export default function SectionEditor({ data, photos, onChange }: { data: Invita
       {([['galleryTitle','Judul galeri'],['galleryVideo','URL video embed galeri (kosongkan untuk foto)'],['storyTitle','Judul cerita'],['giftTitle','Judul hadiah'],['giftDescription','Pesan hadiah'],['wishTitle','Judul buku tamu'],['wishDescription','Pesan buku tamu'],['footerText','Pesan penutup']] as const).map(([key,label]) => <Field key={key} label={label} value={data.sections?.[key] || ''} onChange={value => section(key,value)} />)}
       <p className="text-xs text-stone-500">Teks kosong memakai teks bawaan. Kutipan dan rekening ada di tab Data Mempelai &amp; Acara.</p>
       {(['akad','resepsi'] as const).map(key => <div key={key} className="grid sm:grid-cols-2 gap-3"><Field label={`Judul ${key}`} value={data.events[key].title} onChange={value => onChange({ ...data, events: { ...data.events, [key]: { ...data.events[key], title: value } } })} /><Field label={`Link Maps ${key}`} value={data.events[key].mapsUrl} onChange={value => onChange({ ...data, events: { ...data.events, [key]: { ...data.events[key], mapsUrl: value } } })} /></div>)}
+    </section>
+    <section className="rounded-xl bg-white border p-5 space-y-4">
+      <h2 className="font-bold">Dress Code</h2>
+      <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={dressCode.enabled} onChange={e => updateDressCode({ enabled: e.target.checked })} />Tampilkan section Dress Code</label>
+      <Field label="Judul" value={dressCode.title} onChange={title => updateDressCode({ title })} />
+      <Field label="Pesan dress code" value={dressCode.description} onChange={description => updateDressCode({ description })} />
+      <p className="text-sm text-stone-500">Palet warna busana, sesuai urutan tampil di undangan.</p>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {dressCode.colors.map((color, index) => <div key={index} className="rounded-lg border border-stone-200 p-3 space-y-2">
+          <label className="flex items-center gap-2 text-sm"><input type="color" aria-label={`Warna ${index + 1}`} value={color.hex} onChange={e => updateDressCode({ colors: dressCode.colors.map((c, i) => i === index ? { ...c, hex: e.target.value } : c) })} />{color.hex}</label>
+          <input className={input} aria-label={`Nama warna ${index + 1}`} value={color.name} onChange={e => updateDressCode({ colors: dressCode.colors.map((c, i) => i === index ? { ...c, name: e.target.value } : c) })} />
+          <button type="button" disabled={dressCode.colors.length <= 1} className="text-xs text-red-700 disabled:opacity-40" onClick={() => updateDressCode({ colors: dressCode.colors.filter((_, i) => i !== index) })}>Hapus warna</button>
+        </div>)}
+      </div>
+      <button type="button" disabled={dressCode.colors.length >= 24} className="rounded bg-amber-100 px-4 py-2 text-amber-900 disabled:opacity-40" onClick={() => updateDressCode({ colors: [...dressCode.colors, { name: "Warna baru", hex: "#C5B6A3" }] })}>+ Tambah warna</button>
     </section>
     <section className="rounded-xl bg-white border p-5 space-y-4"><h2 className="font-bold">Cerita perjalanan</h2>
       {story.map((item,index) => <div key={index} className="rounded-lg border p-4 space-y-3">

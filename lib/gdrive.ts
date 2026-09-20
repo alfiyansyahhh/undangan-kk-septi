@@ -1,3 +1,5 @@
+import type { DressCode } from "./dressCode";
+
 export interface GDrivePhoto {
   id: string;
   name: string;
@@ -6,6 +8,7 @@ export interface GDrivePhoto {
 }
 
 export interface InvitationData {
+  dressCode?: DressCode;
   music?: { enabled: boolean; title: string; url: string; volume: number; loop: boolean };
   couple: {
     title: string;
