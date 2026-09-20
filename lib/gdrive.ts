@@ -46,6 +46,7 @@ export interface InvitationData {
     resepsi?: string;
     gift?: string;
     galleryCover?: string;
+    closing?: string;
   };
   events: {
     targetDate: string;
@@ -83,6 +84,7 @@ export interface InvitationData {
     wishTitle?: string;
     wishDescription?: string;
     footerText?: string;
+    closingMessage?: string;
   };
   gifts?: Array<{
     bank: string;

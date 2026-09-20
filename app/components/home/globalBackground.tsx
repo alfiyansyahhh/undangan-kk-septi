@@ -25,8 +25,8 @@ export default function GlobalBackground({ photos = [] }: GlobalBackgroundProps)
       transitionTimer = setTimeout(() => {
         setCurrentIndex(upcomingIndex);
         setIsTransitioning(false);
-      }, 1500);
-    }, 5000);
+      }, 800);
+    }, 2500);
 
     return () => {
       clearInterval(timer);
@@ -59,7 +59,7 @@ export default function GlobalBackground({ photos = [] }: GlobalBackgroundProps)
       {/* Next Incoming Image (Cross-fade) */}
       {photos.length > 1 && (
         <div
-          className={`absolute inset-0 transition-opacity duration-1500 ease-in-out motion-reduce:transition-none ${
+          className={`absolute inset-0 transition-opacity duration-[800ms] ease-in-out motion-reduce:transition-none ${
             isTransitioning ? "opacity-100" : "opacity-0"
           }`}
         >

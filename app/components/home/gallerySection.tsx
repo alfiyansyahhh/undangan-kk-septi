@@ -3,7 +3,7 @@
 import { revealMotion } from "./revealMotion";
 import { motion } from "framer-motion";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { getDriveThumbnailUrl, getDriveFullUrl } from "@/lib/gdrive";
 
 interface GallerySectionProps {
@@ -20,6 +20,9 @@ export default function GallerySection({
   videoUrl,
 }: GallerySectionProps) {
   const [activeModalPhoto, setActiveModalPhoto] = useState<string | null>(null);
+
+  const [visibleCount, setVisibleCount] = useState(9);
+  const gallerySection = useRef<HTMLElement>(null);
 
   // Helper untuk menentukan URL thumbnail yang aman
   const getThumbUrl = (photoSrc: string) => {
@@ -43,7 +46,7 @@ export default function GallerySection({
   const featured = coverPhoto || photos[0];
 
   return (
-    <section className="relative z-10 px-6 py-10 sm:px-8">
+    <section ref={gallerySection} className="relative z-10 px-6 py-10 sm:px-8">
       <div className="mx-auto max-w-md space-y-6">
         <motion.div {...revealMotion("title", 0)} className="flex items-center gap-4 pb-3">
           <h2 className="shrink-0 font-serif text-2xl sm:text-3xl text-white tracking-wide uppercase">
@@ -84,8 +87,8 @@ export default function GallerySection({
         )}
 
         {photos.length > 0 && (
-          <div className="grid grid-cols-3 gap-3 sm:gap-4">
-            {photos.map((photoItem, idx) => (
+          <div id="gallery-photos" className="grid grid-cols-3 gap-3 sm:gap-4">
+            {photos.slice(0, visibleCount).map((photoItem, idx) => (
               <motion.button {...revealMotion("zoom", 0.1)}
                 type="button"
                 key={`${photoItem}-${idx}`}
@@ -102,6 +105,18 @@ export default function GallerySection({
                 />
               </motion.button>
             ))}
+          </div>
+        )}
+        {photos.length > 9 && (
+          <div className="space-y-3 text-center">
+            <p className="text-xs text-stone-400">{Math.min(visibleCount, photos.length)} dari {photos.length} foto</p>
+            <div className="flex flex-wrap justify-center gap-3">
+              {visibleCount < photos.length && <button type="button" aria-controls="gallery-photos" onClick={() => setVisibleCount(count => count + 9)} className="rounded-full border border-[#c9a96e]/50 bg-black/60 px-5 py-3 text-sm text-[#eee5d5] transition-colors hover:bg-[#c9a96e]/20">Lihat lebih banyak</button>}
+              {visibleCount > 9 && <button type="button" aria-controls="gallery-photos" onClick={() => {
+                setVisibleCount(9);
+                gallerySection.current?.scrollIntoView({ behavior: "instant", block: "start" });
+              }} className="rounded-full border border-white/20 bg-black/60 px-5 py-3 text-sm text-stone-300 transition-colors hover:bg-white/10">Lebih sedikit</button>}
+            </div>
           </div>
         )}
       </div>

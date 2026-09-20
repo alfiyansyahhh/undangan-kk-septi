@@ -78,7 +78,7 @@ export default function AdminPage() {
     try {
       const save = await fetch("/api/invitation", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
       if (!save.ok) throw new Error("Gagal menyimpan undangan. Periksa sesi login dan data.");
-      const sources = [data.couple.bride.photo,data.couple.groom.photo,data.photos.cover,data.photos.akad,data.photos.resepsi,data.photos.gift,data.photos.galleryCover,...data.photos.gallery,...(data.photos.coverSlides||[]),...(data.photos.quoteSlides||[]),...(data.story||[]).map(item=>item.image)];
+      const sources = [data.couple.bride.photo,data.couple.groom.photo,data.photos.cover,data.photos.akad,data.photos.resepsi,data.photos.gift,data.photos.galleryCover,data.photos.closing,...data.photos.gallery,...(data.photos.coverSlides||[]),...(data.photos.quoteSlides||[]),...(data.story||[]).map(item=>item.image)];
       const ids = [...new Set(sources.filter((src): src is string=>!!src).map(extractDriveId).filter((id): id is string=>!!id))];
       const failed:string[]=[];let done=0;
       for (const id of ids) {

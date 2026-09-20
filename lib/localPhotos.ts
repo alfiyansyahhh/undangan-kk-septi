@@ -3,13 +3,13 @@ import { extractDriveId } from "./gdrive";
 import type { InvitationData } from "./gdrive";
 export const localPhotoDatabase = database;
 export function photoReferences(data: InvitationData): string[] {
-  return [data.couple.bride.photo, data.couple.groom.photo, data.photos.cover, data.photos.akad, data.photos.resepsi, data.photos.gift, data.photos.galleryCover, ...data.photos.gallery, ...(data.photos.coverSlides || []), ...(data.photos.background || []), ...(data.photos.quoteSlides || []), ...(data.story || []).map(item => item.image)].filter((v): v is string => !!v);
+  return [data.couple.bride.photo, data.couple.groom.photo, data.photos.cover, data.photos.akad, data.photos.resepsi, data.photos.gift, data.photos.galleryCover, data.photos.closing, ...data.photos.gallery, ...(data.photos.coverSlides || []), ...(data.photos.background || []), ...(data.photos.quoteSlides || []), ...(data.story || []).map(item => item.image)].filter((v): v is string => !!v);
 }
 export async function localizeInvitation(data: InvitationData): Promise<InvitationData> {
   const ids = new Set((await localPhotoDatabase().prepare("SELECT id FROM local_photos").all()).map(row => String(row.id)));
   const resolve = (src: string) => { const id = extractDriveId(src); return id && ids.has(id) ? `/api/media/${id}` : src; };
   return { ...data, couple:{ ...data.couple, bride:{...data.couple.bride,photo:resolve(data.couple.bride.photo)},groom:{...data.couple.groom,photo:resolve(data.couple.groom.photo)} },
-    photos:{ ...data.photos, cover:resolve(data.photos.cover), gallery:data.photos.gallery.map(resolve), coverSlides:data.photos.coverSlides?.map(resolve), background:data.photos.background?.map(resolve), quoteSlides:data.photos.quoteSlides?.map(resolve), akad:data.photos.akad && resolve(data.photos.akad), resepsi:data.photos.resepsi && resolve(data.photos.resepsi), gift:data.photos.gift && resolve(data.photos.gift), galleryCover:data.photos.galleryCover && resolve(data.photos.galleryCover) },
+    photos:{ ...data.photos, closing:data.photos.closing && resolve(data.photos.closing), cover:resolve(data.photos.cover), gallery:data.photos.gallery.map(resolve), coverSlides:data.photos.coverSlides?.map(resolve), background:data.photos.background?.map(resolve), quoteSlides:data.photos.quoteSlides?.map(resolve), akad:data.photos.akad && resolve(data.photos.akad), resepsi:data.photos.resepsi && resolve(data.photos.resepsi), gift:data.photos.gift && resolve(data.photos.gift), galleryCover:data.photos.galleryCover && resolve(data.photos.galleryCover) },
     story:data.story?.map(item=>({...item,image:item.image && resolve(item.image)})) };
 }
 export function imageMime(bytes: Uint8Array): string | null {

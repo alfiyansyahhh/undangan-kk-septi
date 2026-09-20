@@ -1,4 +1,5 @@
 "use client";
+import ClosingPhotoSection from "./components/home/closingPhotoSection";
 import DressCodeSection from "./components/home/dressCodeSection";
 
 import { useState, useEffect, Suspense } from "react";
@@ -229,6 +230,7 @@ function InvitationContent() {
               photos={data.photos.gallery}
             />
 
+
             {/* Gift Section */}
             {/* <GiftSection
               title={data.sections?.giftTitle}
@@ -241,6 +243,8 @@ function InvitationContent() {
 
             {/* Wish / Ucapan Section */}
             <WishSection guestName={verifiedName} title={data.sections?.wishTitle} description={data.sections?.wishDescription} wishes={wishes} onSubmitWish={handleAddWish} />
+
+            <ClosingPhotoSection photo={data.photos.closing || data.photos.gallery.at(-1) || data.photos.cover} message={data.sections?.closingMessage} />
 
             {/* Footer Section */}
             <FooterSection
