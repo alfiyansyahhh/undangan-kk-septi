@@ -443,7 +443,7 @@ export default function AdminPage() {
         <button type="button" onClick={() => setActiveTab("share")} className="mb-6 ml-3 rounded-lg bg-emerald-700 px-5 py-3 text-sm font-semibold text-white">Bagikan Undangan</button>
         <button type="button" onClick={() => setActiveTab("music")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">♫ Lagu</button>
         <button type="button" onClick={() => setActiveTab("checkin")} className="mb-6 ml-3 rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white">QR Check-in</button>
-        {activeTab === "checkin" && <CheckInEditor />}
+        {activeTab === "checkin" && <><Link href="/admin/qr" className="mb-4 inline-flex min-h-12 items-center rounded-xl border bg-white px-4 text-sm font-medium text-emerald-800">Buka halaman khusus petugas QR</Link><CheckInEditor /></>}
         {activeTab === "music" && <MusicEditor data={data} onChange={setData} />}
         {activeTab === "share" && <ShareEditor data={data} onChange={setData} />}
         {activeTab === "wishes" && <WishesEditor />}

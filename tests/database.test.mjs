@@ -49,7 +49,7 @@ test('API saves section settings, imports photos, persists wishes and rejects ma
       registerHooks({ resolve(specifier, context, next) {
         if (specifier.startsWith('@/')) return { url:pathToFileURL(path.resolve(specifier.slice(2) + '.ts')).href, shortCircuit:true };
         if (specifier === 'next/server') return next('next/server.js',context);
-        if (specifier === './database' || specifier === './gdrive') return next(specifier+'.ts',context);
+        if (specifier === './database' || specifier === './gdrive' || specifier === './requestOrigin') return next(specifier+'.ts',context);
         return next(specifier, context);
       }});
       const invitation = await import('./app/api/invitation/route.ts');

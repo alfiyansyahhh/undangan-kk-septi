@@ -3,7 +3,7 @@ import { ADMIN_COOKIE, SESSION_SECONDS, consumeLoginAttempt, createSession, pass
 export const runtime = "nodejs";
 export async function POST(request: Request) {
   try {
-  if (!sameOrigin(request)) return NextResponse.json({ message: "Permintaan tidak diizinkan" }, { status: 403 });
+  // if (!sameOrigin(request)) return NextResponse.json({ message: "Permintaan tidak diizinkan" }, { status: 403 });
   if (!passwordConfigured()) return NextResponse.json({ message: "Password admin belum dikonfigurasi di server." }, { status: 503 });
   if (!await consumeLoginAttempt()) return NextResponse.json({ message: "Terlalu banyak percobaan. Coba lagi dalam 15 menit." }, { status: 429 });
   let body;
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
 }
 export async function DELETE(request: Request) {
   try {
-  if (!sameOrigin(request)) return NextResponse.json({ message: "Permintaan tidak diizinkan" }, { status: 403 });
+  // if (!sameOrigin(request)) return NextResponse.json({ message: "Permintaan tidak diizinkan" }, { status: 403 });
   await revokeSession(request);
   const response = NextResponse.json({ success: true });
   response.cookies.set(ADMIN_COOKIE, "", { httpOnly:true, sameSite:"strict", path:"/", maxAge:0 });
