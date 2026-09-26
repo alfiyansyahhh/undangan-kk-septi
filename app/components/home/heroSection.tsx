@@ -15,7 +15,7 @@ export default function HeroSection({
   displayDate,
 }: HeroSectionProps) {
   return (
-    <section className="relative w-full h-screen min-h-[600px] flex flex-col justify-end text-white bg-transparent">
+    <section id="HeroSection-slider-section" className="relative w-full h-screen min-h-[600px] flex flex-col justify-end text-white bg-transparent">
       {/* Hero Typography Content */}
       <div className="relative z-10 text-center px-6 pb-16 pt-20 space-y-4 max-w-md mx-auto w-full">
         <motion.p {...revealMotion("fade", 0)} className="text-[10px] sm:text-xs uppercase tracking-[0.4em] text-stone-300 font-sans font-light">

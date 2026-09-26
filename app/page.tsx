@@ -111,7 +111,7 @@ function InvitationContent() {
   const handleOpenInvitation = () => {
     setIsOpen(true);
     setTimeout(() => {
-      document.getElementById("quote-slider-section")?.scrollIntoView({ behavior: "smooth" });
+      document.getElementById("HeroSection-slider-section")?.scrollIntoView({ behavior: "smooth" });
     }, 100);
   };
 
