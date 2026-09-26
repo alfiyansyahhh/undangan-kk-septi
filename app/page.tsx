@@ -148,7 +148,7 @@ function InvitationContent() {
 
       {/* 1. COVER SCREEN */}
       <CoverSection
-        isOpen={true}
+        isOpen={isOpen}
         coverPhotos={slideshowPhotos}
         brideShortName={data.couple.bride.shortName}
         groomShortName={data.couple.groom.shortName}
