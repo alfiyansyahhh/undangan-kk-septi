@@ -45,7 +45,11 @@ export default function GlobalBackground({ photos = [] }: GlobalBackgroundProps)
     : getDriveThumbnailUrl(photos[nextIndex], 1200);
 
   return (
-    <div aria-hidden="true" className="fixed inset-y-0 right-0 z-0 pointer-events-none overflow-hidden bg-black w-full lg:w-5/12 xl:w-1/3">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-0 overflow-hidden bg-black lg:left-auto lg:right-0 lg:w-5/12 xl:w-1/3"
+      style={{ height: "100vh", minHeight: "100vh", maxHeight: "100vh" }}
+    >
       {/* Current Active Image */}
       <div className="absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -59,9 +63,7 @@ export default function GlobalBackground({ photos = [] }: GlobalBackgroundProps)
       {/* Next Incoming Image (Cross-fade) */}
       {photos.length > 1 && (
         <div
-          className={`absolute inset-0 transition-opacity duration-[800ms] ease-in-out motion-reduce:transition-none ${
-            isTransitioning ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute inset-0 transition-opacity duration-[800ms] ease-in-out motion-reduce:transition-none ${isTransitioning ? "opacity-100" : "opacity-0"}`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

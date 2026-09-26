@@ -61,11 +61,11 @@ export default function CoverSection({
     ? photosToRender[nextIndex]
     : getDriveThumbnailUrl(photosToRender[nextIndex], 1200);
 
+  if (isOpen) return null;
+
   return (
     <section
-      className={`fixed inset-0 z-50 flex flex-col justify-end text-white transition-all duration-1000 bg-black ${
-        isOpen ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
-      }`}
+      className="fixed inset-0 z-50 flex flex-col justify-end text-white transition-all duration-1000 bg-black translate-y-0 opacity-100"
     >
       {/* Background Ultra-Smooth Crossfade & Slow Zoom */}
       <div className="absolute inset-0 overflow-hidden bg-black">

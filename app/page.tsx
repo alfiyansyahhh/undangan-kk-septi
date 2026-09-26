@@ -132,7 +132,23 @@ function InvitationContent() {
     setWishes(current => [saved, ...current.filter(w => w.id !== saved.id)]);
   };
 
-  useEffect(() => { if (data) document.title = data.couple.title; }, [data?.couple.title]);
+  useEffect(() => {
+    if (data) document.title = data.couple.title;
+  }, [data?.couple.title]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+
+    root.style.overflow = isOpen ? "auto" : "hidden";
+    document.body.style.overflow = isOpen ? "auto" : "hidden";
+
+    return () => {
+      root.style.overflow = previousOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [isOpen]);
 
   if (!data) return <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-black text-stone-300"><p role="status">{loadError ? "Undangan belum berhasil dimuat." : "Memuat undangan…"}</p>{loadError && <button onClick={() => window.location.reload()} className="rounded border border-white/30 px-4 py-2">Coba lagi</button>}</main>;
 
