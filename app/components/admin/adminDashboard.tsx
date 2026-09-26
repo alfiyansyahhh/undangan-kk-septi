@@ -406,8 +406,8 @@ export default function AdminPage() {
       {saveMessage && (
         <div
           className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${saveMessage.type === "success"
-              ? "bg-emerald-800 text-emerald-100"
-              : "bg-red-800 text-red-100"
+            ? "bg-emerald-800 text-emerald-100"
+            : "bg-red-800 text-red-100"
             }`}
         >
           {saveMessage.text}
@@ -417,33 +417,38 @@ export default function AdminPage() {
       {/* Main Container */}
       <main className="max-w-6xl mx-auto px-4 pt-6">
         {/* Tab Switcher */}
-        <div className="flex border-b border-stone-200 mb-6">
-          <button
-            onClick={() => setActiveTab("photos")}
-            className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${activeTab === "photos"
+        <div className="mb-6 space-y-3">
+          <div className="flex flex-wrap border-b border-stone-200">
+            <button
+              onClick={() => setActiveTab("photos")}
+              className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${activeTab === "photos"
                 ? "border-amber-600 text-amber-700 bg-amber-50/50"
                 : "border-transparent text-stone-500 hover:text-stone-800"
-              }`}
-          >
-            📸 Master Foto GDrive ({photos.length} Foto)
-          </button>
-          <button
-            onClick={() => setActiveTab("info")}
-            className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${activeTab === "info"
+                }`}
+            >
+              📸 Master Foto GDrive ({photos.length} Foto)
+            </button>
+            <button
+              onClick={() => setActiveTab("info")}
+              className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${activeTab === "info"
                 ? "border-amber-600 text-amber-700 bg-amber-50/50"
                 : "border-transparent text-stone-500 hover:text-stone-800"
-              }`}
-          >
-            📝 Data Mempelai & Acara
-          </button>
+                }`}
+            >
+              📝 Data Mempelai & Acara
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button type="button" onClick={() => setActiveTab("sections")} className={`min-h-11 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${activeTab === "sections" ? "bg-amber-600 text-white shadow-sm" : "border border-stone-300 bg-white text-stone-700 hover:bg-stone-50"}`}>Section, Foto &amp; Cerita</button>
+            <button type="button" onClick={() => setActiveTab("wishes")} className="min-h-11 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-stone-50">Buku Tamu</button>
+            <button type="button" onClick={() => setActiveTab("share")} className="min-h-11 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-800">Bagikan Undangan</button>
+            <button type="button" onClick={() => setActiveTab("music")} className="min-h-11 rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm font-semibold text-stone-700 transition hover:bg-stone-50">♫ Lagu</button>
+            <button type="button" onClick={() => setActiveTab("checkin")} className="min-h-11 rounded-xl bg-emerald-800 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-900">QR Check-in</button>
+          </div>
         </div>
 
-        <button type="button" onClick={() => setActiveTab("sections")} className={`mb-6 rounded-lg px-5 py-3 text-sm font-semibold ${activeTab === "sections" ? "bg-amber-600 text-white" : "bg-white border border-stone-300"}`}>Section, Foto &amp; Cerita</button>
-        <button type="button" onClick={() => setActiveTab("wishes")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">Buku Tamu</button>
-        <button type="button" onClick={() => setActiveTab("share")} className="mb-6 ml-3 rounded-lg bg-emerald-700 px-5 py-3 text-sm font-semibold text-white">Bagikan Undangan</button>
-        <button type="button" onClick={() => setActiveTab("music")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">♫ Lagu</button>
-        <button type="button" onClick={() => setActiveTab("checkin")} className="mb-6 ml-3 rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white">QR Check-in</button>
-        {activeTab === "checkin" && <><Link href="/admin/qr" className="mb-4 inline-flex min-h-12 items-center rounded-xl border bg-white px-4 text-sm font-medium text-emerald-800">Buka halaman khusus petugas QR</Link><CheckInEditor /></>}
+        {activeTab === "checkin" && <><Link href="/admin/qr" className="mb-4 inline-flex min-h-11 items-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-medium text-emerald-800 transition hover:bg-emerald-100">Buka halaman khusus petugas QR</Link><CheckInEditor /></>}
         {activeTab === "music" && <MusicEditor data={data} onChange={setData} />}
         {activeTab === "share" && <ShareEditor data={data} onChange={setData} />}
         {activeTab === "wishes" && <WishesEditor />}
@@ -615,8 +620,8 @@ export default function AdminPage() {
                     type="button"
                     onClick={() => setPhotoFilter("all")}
                     className={`px-3 py-1 rounded-md transition ${photoFilter === "all"
-                        ? "bg-white text-stone-900 shadow-xs font-semibold"
-                        : "text-stone-600 hover:text-stone-900"
+                      ? "bg-white text-stone-900 shadow-xs font-semibold"
+                      : "text-stone-600 hover:text-stone-900"
                       }`}
                   >
                     Semua ({photos.length})
@@ -625,8 +630,8 @@ export default function AdminPage() {
                     type="button"
                     onClick={() => setPhotoFilter("selected")}
                     className={`px-3 py-1 rounded-md transition ${photoFilter === "selected"
-                        ? "bg-emerald-600 text-white shadow-xs font-semibold"
-                        : "text-stone-600 hover:text-stone-900"
+                      ? "bg-emerald-600 text-white shadow-xs font-semibold"
+                      : "text-stone-600 hover:text-stone-900"
                       }`}
                   >
                     ✓ Terpilih ({galleryList.length})
@@ -635,8 +640,8 @@ export default function AdminPage() {
                     type="button"
                     onClick={() => setPhotoFilter("unselected")}
                     className={`px-3 py-1 rounded-md transition ${photoFilter === "unselected"
-                        ? "bg-amber-600 text-white shadow-xs font-semibold"
-                        : "text-stone-600 hover:text-stone-900"
+                      ? "bg-amber-600 text-white shadow-xs font-semibold"
+                      : "text-stone-600 hover:text-stone-900"
                       }`}
                   >
                     Belum ({photos.length - galleryList.length})
@@ -665,10 +670,10 @@ export default function AdminPage() {
                           <div
                             key={photo.id}
                             className={`bg-white rounded-xl border overflow-hidden shadow-xs flex flex-col transition relative ${inGallery
-                                ? "border-emerald-500 ring-2 ring-emerald-300"
-                                : isCover || isGroom || isBride
-                                  ? "border-amber-500 ring-2 ring-amber-200"
-                                  : "border-stone-200 hover:border-stone-300"
+                              ? "border-emerald-500 ring-2 ring-emerald-300"
+                              : isCover || isGroom || isBride
+                                ? "border-amber-500 ring-2 ring-amber-200"
+                                : "border-stone-200 hover:border-stone-300"
                               }`}
                           >
                             {/* Image Thumbnail with Direct Click-to-Select */}
@@ -690,8 +695,8 @@ export default function AdminPage() {
                               <div className="absolute top-2 right-2 z-20">
                                 <div
                                   className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition ${inGallery
-                                      ? "bg-emerald-600 text-white ring-2 ring-white"
-                                      : "bg-black/40 text-white/70 hover:bg-black/60"
+                                    ? "bg-emerald-600 text-white ring-2 ring-white"
+                                    : "bg-black/40 text-white/70 hover:bg-black/60"
                                     }`}
                                 >
                                   {inGallery ? "✓" : "+"}
@@ -738,8 +743,8 @@ export default function AdminPage() {
                                   onClick={() => setCoverPhoto(photo)}
                                   title="Jadikan Foto Cover Utama"
                                   className={`py-1 rounded text-center font-medium transition ${isCover
-                                      ? "bg-amber-600 text-white font-bold"
-                                      : "bg-stone-100 hover:bg-amber-100 text-stone-700"
+                                    ? "bg-amber-600 text-white font-bold"
+                                    : "bg-stone-100 hover:bg-amber-100 text-stone-700"
                                     }`}
                                 >
                                   Cover
@@ -749,8 +754,8 @@ export default function AdminPage() {
                                   onClick={() => setGroomPhoto(photo)}
                                   title="Jadikan Foto Pengantin Pria"
                                   className={`py-1 rounded text-center font-medium transition ${isGroom
-                                      ? "bg-blue-600 text-white font-bold"
-                                      : "bg-stone-100 hover:bg-blue-100 text-stone-700"
+                                    ? "bg-blue-600 text-white font-bold"
+                                    : "bg-stone-100 hover:bg-blue-100 text-stone-700"
                                     }`}
                                 >
                                   Pria
@@ -760,8 +765,8 @@ export default function AdminPage() {
                                   onClick={() => setBridePhoto(photo)}
                                   title="Jadikan Foto Pengantin Wanita"
                                   className={`py-1 rounded text-center font-medium transition ${isBride
-                                      ? "bg-rose-600 text-white font-bold"
-                                      : "bg-stone-100 hover:bg-rose-100 text-stone-700"
+                                    ? "bg-rose-600 text-white font-bold"
+                                    : "bg-stone-100 hover:bg-rose-100 text-stone-700"
                                     }`}
                                 >
                                   Wanita
@@ -773,8 +778,8 @@ export default function AdminPage() {
                                   type="button"
                                   onClick={() => toggleGalleryPhoto(photo.id)}
                                   className={`grow py-1 rounded text-center font-semibold transition ${inGallery
-                                      ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
-                                      : "bg-stone-100 text-stone-700 hover:bg-emerald-50"
+                                    ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
+                                    : "bg-stone-100 text-stone-700 hover:bg-emerald-50"
                                     }`}
                                 >
                                   {inGallery ? "✓ Ada di Galeri" : "+ Pilih Galeri"}
@@ -889,8 +894,8 @@ export default function AdminPage() {
                       type="button"
                       onClick={handleCopyScript}
                       className={`mt-1 w-full py-2 rounded-lg text-xs font-semibold shadow-xs transition flex items-center justify-center gap-1.5 ${copiedScript
-                          ? "bg-emerald-700 text-white"
-                          : "bg-amber-600 hover:bg-amber-700 text-white"
+                        ? "bg-emerald-700 text-white"
+                        : "bg-amber-600 hover:bg-amber-700 text-white"
                         }`}
                     >
                       {copiedScript ? "✓ Script Berhasil Disalin!" : "📋 Klik untuk Salin Script Pemindai"}
