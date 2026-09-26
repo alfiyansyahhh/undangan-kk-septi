@@ -3,6 +3,27 @@
 import { motion } from "framer-motion";
 import { getDriveThumbnailUrl } from "@/lib/gdrive";
 
+function formatParentName(value: string | undefined, kind: "father" | "mother") {
+  const raw = (value ?? "").trim();
+  if (!raw) return kind === "father" ? "Bapak" : "Ibu";
+
+  const cleaned = raw
+    .replace(/^almarhumah\s+/i, "")
+    .replace(/^almarhum\s+/i, "")
+    .replace(/^almh\.\s*/i, "")
+    .replace(/^alm\.\s*/i, "")
+    .replace(/^bapak\s+/i, "")
+    .replace(/^ibu\s+/i, "")
+    .trim();
+
+  const isAlmarhum = /^(almarhumah|almh\.|almarhum|alm\.)/i.test(raw);
+  const title = kind === "father"
+    ? (isAlmarhum ? "Almarhum Bapak" : "Bapak")
+    : (isAlmarhum ? "Almarhumah Ibu" : "Ibu");
+
+  return cleaned ? `${title} ${cleaned}` : title;
+}
+
 interface BrideSectionProps {
   photo: string;
   fullName: string;
@@ -81,7 +102,7 @@ export default function BrideSection({
           </h3>
 
           <p className="text-xs text-stone-400 font-sans tracking-wider leading-relaxed">
-            Putri dari Bapak {fatherName} &amp; Ibu {motherName}
+            Putri dari {formatParentName(fatherName, "father")} &amp; {formatParentName(motherName, "mother")}
           </p>
 
           {instagram && (

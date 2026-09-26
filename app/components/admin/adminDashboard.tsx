@@ -76,21 +76,21 @@ export default function AdminPage() {
     if (!data || localProgress !== null) return;
     setLocalProgress("Menyimpan undangan…"); setLocalReport("");
     try {
-      const save = await fetch("/api/invitation", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+      const save = await fetch("/api/invitation", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
       if (!save.ok) throw new Error("Gagal menyimpan undangan. Periksa sesi login dan data.");
-      const sources = [data.couple.bride.photo,data.couple.groom.photo,data.photos.cover,data.photos.akad,data.photos.resepsi,data.photos.gift,data.photos.galleryCover,data.photos.closing,...data.photos.gallery,...(data.photos.coverSlides||[]),...(data.photos.quoteSlides||[]),...(data.story||[]).map(item=>item.image)];
-      const ids = [...new Set(sources.filter((src): src is string=>!!src).map(extractDriveId).filter((id): id is string=>!!id))];
-      const failed:string[]=[];let done=0;
+      const sources = [data.couple.bride.photo, data.couple.groom.photo, data.photos.cover, data.photos.akad, data.photos.resepsi, data.photos.gift, data.photos.galleryCover, data.photos.closing, ...data.photos.gallery, ...(data.photos.coverSlides || []), ...(data.photos.quoteSlides || []), ...(data.story || []).map(item => item.image)];
+      const ids = [...new Set(sources.filter((src): src is string => !!src).map(extractDriveId).filter((id): id is string => !!id))];
+      const failed: string[] = []; let done = 0;
       for (const id of ids) {
         setLocalProgress(`Menyalin foto ${++done}/${ids.length}…`);
         try {
-          const response = await fetch("/api/photos/local",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id})});
+          const response = await fetch("/api/photos/local", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
           const result = await response.json();
-          if(!response.ok)throw new Error(result.message);
-        } catch(error) { failed.push(`${id}: ${error instanceof Error?error.message:"Gagal diunduh"}`); }
+          if (!response.ok) throw new Error(result.message);
+        } catch (error) { failed.push(`${id}: ${error instanceof Error ? error.message : "Gagal diunduh"}`); }
       }
-      setLocalReport(`${ids.length-failed.length}/${ids.length} foto tersedia lokal. Foto yang gagal tetap memakai Drive. ${failed.join("; ")}`);
-    } catch(error) { setLocalReport(error instanceof Error?error.message:"Gagal menyalin foto"); }
+      setLocalReport(`${ids.length - failed.length}/${ids.length} foto tersedia lokal. Foto yang gagal tetap memakai Drive. ${failed.join("; ")}`);
+    } catch (error) { setLocalReport(error instanceof Error ? error.message : "Gagal menyalin foto"); }
     finally { setLocalProgress(null); }
   };
 
@@ -374,8 +374,8 @@ export default function AdminPage() {
 
           <div className="flex items-center gap-3">
             <button type="button" className="text-sm text-stone-600" onClick={async () => {
-              try { const res = await fetch("/api/admin/session", { method:"DELETE" }); if (!res.ok) throw new Error(); window.location.reload(); }
-              catch { setSaveMessage({ text:"Gagal keluar. Coba lagi.",type:"error" }); }
+              try { const res = await fetch("/api/admin/session", { method: "DELETE" }); if (!res.ok) throw new Error(); window.location.reload(); }
+              catch { setSaveMessage({ text: "Gagal keluar. Coba lagi.", type: "error" }); }
             }}>Keluar</button>
             <Link
               href="/"
@@ -403,11 +403,10 @@ export default function AdminPage() {
       {/* Floating Save Alert */}
       {saveMessage && (
         <div
-          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${
-            saveMessage.type === "success"
+          className={`fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-sm font-medium ${saveMessage.type === "success"
               ? "bg-emerald-800 text-emerald-100"
               : "bg-red-800 text-red-100"
-          }`}
+            }`}
         >
           {saveMessage.text}
         </div>
@@ -419,21 +418,19 @@ export default function AdminPage() {
         <div className="flex border-b border-stone-200 mb-6">
           <button
             onClick={() => setActiveTab("photos")}
-            className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${
-              activeTab === "photos"
+            className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${activeTab === "photos"
                 ? "border-amber-600 text-amber-700 bg-amber-50/50"
                 : "border-transparent text-stone-500 hover:text-stone-800"
-            }`}
+              }`}
           >
             📸 Master Foto GDrive ({photos.length} Foto)
           </button>
           <button
             onClick={() => setActiveTab("info")}
-            className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${
-              activeTab === "info"
+            className={`py-2.5 px-5 font-semibold text-sm border-b-2 transition ${activeTab === "info"
                 ? "border-amber-600 text-amber-700 bg-amber-50/50"
                 : "border-transparent text-stone-500 hover:text-stone-800"
-            }`}
+              }`}
           >
             📝 Data Mempelai & Acara
           </button>
@@ -613,33 +610,30 @@ export default function AdminPage() {
                   <button
                     type="button"
                     onClick={() => setPhotoFilter("all")}
-                    className={`px-3 py-1 rounded-md transition ${
-                      photoFilter === "all"
+                    className={`px-3 py-1 rounded-md transition ${photoFilter === "all"
                         ? "bg-white text-stone-900 shadow-xs font-semibold"
                         : "text-stone-600 hover:text-stone-900"
-                    }`}
+                      }`}
                   >
                     Semua ({photos.length})
                   </button>
                   <button
                     type="button"
                     onClick={() => setPhotoFilter("selected")}
-                    className={`px-3 py-1 rounded-md transition ${
-                      photoFilter === "selected"
+                    className={`px-3 py-1 rounded-md transition ${photoFilter === "selected"
                         ? "bg-emerald-600 text-white shadow-xs font-semibold"
                         : "text-stone-600 hover:text-stone-900"
-                    }`}
+                      }`}
                   >
                     ✓ Terpilih ({galleryList.length})
                   </button>
                   <button
                     type="button"
                     onClick={() => setPhotoFilter("unselected")}
-                    className={`px-3 py-1 rounded-md transition ${
-                      photoFilter === "unselected"
+                    className={`px-3 py-1 rounded-md transition ${photoFilter === "unselected"
                         ? "bg-amber-600 text-white shadow-xs font-semibold"
                         : "text-stone-600 hover:text-stone-900"
-                    }`}
+                      }`}
                   >
                     Belum ({photos.length - galleryList.length})
                   </button>
@@ -666,13 +660,12 @@ export default function AdminPage() {
                         return (
                           <div
                             key={photo.id}
-                            className={`bg-white rounded-xl border overflow-hidden shadow-xs flex flex-col transition relative ${
-                              inGallery
+                            className={`bg-white rounded-xl border overflow-hidden shadow-xs flex flex-col transition relative ${inGallery
                                 ? "border-emerald-500 ring-2 ring-emerald-300"
                                 : isCover || isGroom || isBride
-                                ? "border-amber-500 ring-2 ring-amber-200"
-                                : "border-stone-200 hover:border-stone-300"
-                            }`}
+                                  ? "border-amber-500 ring-2 ring-amber-200"
+                                  : "border-stone-200 hover:border-stone-300"
+                              }`}
                           >
                             {/* Image Thumbnail with Direct Click-to-Select */}
                             <div
@@ -684,20 +677,18 @@ export default function AdminPage() {
                               <img
                                 src={photo.thumbnail}
                                 alt={photo.name}
-                                className={`w-full h-full object-cover transition duration-300 ${
-                                  inGallery ? "brightness-100" : "group-hover:scale-105 opacity-90 group-hover:opacity-100"
-                                }`}
+                                className={`w-full h-full object-cover transition duration-300 ${inGallery ? "brightness-100" : "group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                                  }`}
                                 loading="lazy"
                               />
 
                               {/* Selection Checkbox Circle (Top Right) */}
                               <div className="absolute top-2 right-2 z-20">
                                 <div
-                                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition ${
-                                    inGallery
+                                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-md transition ${inGallery
                                       ? "bg-emerald-600 text-white ring-2 ring-white"
                                       : "bg-black/40 text-white/70 hover:bg-black/60"
-                                  }`}
+                                    }`}
                                 >
                                   {inGallery ? "✓" : "+"}
                                 </div>
@@ -742,11 +733,10 @@ export default function AdminPage() {
                                   type="button"
                                   onClick={() => setCoverPhoto(photo)}
                                   title="Jadikan Foto Cover Utama"
-                                  className={`py-1 rounded text-center font-medium transition ${
-                                    isCover
+                                  className={`py-1 rounded text-center font-medium transition ${isCover
                                       ? "bg-amber-600 text-white font-bold"
                                       : "bg-stone-100 hover:bg-amber-100 text-stone-700"
-                                  }`}
+                                    }`}
                                 >
                                   Cover
                                 </button>
@@ -754,11 +744,10 @@ export default function AdminPage() {
                                   type="button"
                                   onClick={() => setGroomPhoto(photo)}
                                   title="Jadikan Foto Pengantin Pria"
-                                  className={`py-1 rounded text-center font-medium transition ${
-                                    isGroom
+                                  className={`py-1 rounded text-center font-medium transition ${isGroom
                                       ? "bg-blue-600 text-white font-bold"
                                       : "bg-stone-100 hover:bg-blue-100 text-stone-700"
-                                  }`}
+                                    }`}
                                 >
                                   Pria
                                 </button>
@@ -766,11 +755,10 @@ export default function AdminPage() {
                                   type="button"
                                   onClick={() => setBridePhoto(photo)}
                                   title="Jadikan Foto Pengantin Wanita"
-                                  className={`py-1 rounded text-center font-medium transition ${
-                                    isBride
+                                  className={`py-1 rounded text-center font-medium transition ${isBride
                                       ? "bg-rose-600 text-white font-bold"
                                       : "bg-stone-100 hover:bg-rose-100 text-stone-700"
-                                  }`}
+                                    }`}
                                 >
                                   Wanita
                                 </button>
@@ -780,11 +768,10 @@ export default function AdminPage() {
                                 <button
                                   type="button"
                                   onClick={() => toggleGalleryPhoto(photo.id)}
-                                  className={`grow py-1 rounded text-center font-semibold transition ${
-                                    inGallery
+                                  className={`grow py-1 rounded text-center font-semibold transition ${inGallery
                                       ? "bg-emerald-100 text-emerald-800 border border-emerald-300"
                                       : "bg-stone-100 text-stone-700 hover:bg-emerald-50"
-                                  }`}
+                                    }`}
                                 >
                                   {inGallery ? "✓ Ada di Galeri" : "+ Pilih Galeri"}
                                 </button>
@@ -897,11 +884,10 @@ export default function AdminPage() {
                     <button
                       type="button"
                       onClick={handleCopyScript}
-                      className={`mt-1 w-full py-2 rounded-lg text-xs font-semibold shadow-xs transition flex items-center justify-center gap-1.5 ${
-                        copiedScript
+                      className={`mt-1 w-full py-2 rounded-lg text-xs font-semibold shadow-xs transition flex items-center justify-center gap-1.5 ${copiedScript
                           ? "bg-emerald-700 text-white"
                           : "bg-amber-600 hover:bg-amber-700 text-white"
-                      }`}
+                        }`}
                     >
                       {copiedScript ? "✓ Script Berhasil Disalin!" : "📋 Klik untuk Salin Script Pemindai"}
                     </button>
@@ -1017,6 +1003,7 @@ export default function AdminPage() {
                       <input
                         type="text"
                         value={data.couple.bride.fatherName}
+                        placeholder="Contoh: Alm. Kastur"
                         onChange={(e) =>
                           setData({
                             ...data,
@@ -1034,6 +1021,7 @@ export default function AdminPage() {
                       <input
                         type="text"
                         value={data.couple.bride.motherName}
+                        placeholder="Contoh: Almh. Siti Zaenab"
                         onChange={(e) =>
                           setData({
                             ...data,
@@ -1109,6 +1097,7 @@ export default function AdminPage() {
                       <input
                         type="text"
                         value={data.couple.groom.fatherName}
+                        placeholder="Contoh: Alm. Kastur"
                         onChange={(e) =>
                           setData({
                             ...data,
@@ -1126,6 +1115,7 @@ export default function AdminPage() {
                       <input
                         type="text"
                         value={data.couple.groom.motherName}
+                        placeholder="Contoh: Almh. Siti Zaenab"
                         onChange={(e) =>
                           setData({
                             ...data,
@@ -1412,7 +1402,7 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {data.gifts?.map((gift, idx) => (
                   <div key={idx} className="p-3 bg-stone-50 border border-stone-200 rounded-lg space-y-2">
-                    <button type="button" className="text-xs text-red-700" onClick={() => setData({ ...data, gifts: data.gifts?.filter((_,i) => i !== idx) })}>Hapus rekening</button>
+                    <button type="button" className="text-xs text-red-700" onClick={() => setData({ ...data, gifts: data.gifts?.filter((_, i) => i !== idx) })}>Hapus rekening</button>
                     <div>
                       <label className="block text-xs font-medium text-stone-600 mb-1">Nama Bank / Dompet Digital</label>
                       <input

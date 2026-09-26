@@ -25,17 +25,17 @@ import GlobalBackground from "./components/home/globalBackground";
 function InvitationContent() {
   const searchParams = useSearchParams();
   const guestToken = searchParams.get("guest") || "";
-  const [resolvedGuest, setResolvedGuest] = useState<{token:string;name:string} | null>(null);
+  const [resolvedGuest, setResolvedGuest] = useState<{ token: string; name: string } | null>(null);
   const verifiedName = resolvedGuest?.token === guestToken ? resolvedGuest.name : "";
   const guestName = verifiedName || "Tamu Undangan";
   useEffect(() => {
     if (!guestToken) return;
     const controller = new AbortController();
-    fetch(`/api/guest?guest=${encodeURIComponent(guestToken)}`, {signal:controller.signal}).then(async res => {
+    fetch(`/api/guest?guest=${encodeURIComponent(guestToken)}`, { signal: controller.signal }).then(async res => {
       if (!res.ok) throw new Error("Link tamu tidak valid");
       const guest = await res.json();
-      if (!controller.signal.aborted) setResolvedGuest({token:guestToken,name:guest.name});
-    }).catch(() => {});
+      if (!controller.signal.aborted) setResolvedGuest({ token: guestToken, name: guest.name });
+    }).catch(() => { });
     return () => controller.abort();
   }, [guestToken]);
 
@@ -141,9 +141,9 @@ function InvitationContent() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative font-sans">
-     
-     <MusicPlayer music={data.music} isOpen={isOpen} />
-     <GlobalBackground photos={slideshowPhotos} />
+
+      <MusicPlayer music={data.music} isOpen={isOpen} />
+      <GlobalBackground photos={slideshowPhotos} />
 
       {/* 1. COVER SCREEN */}
       <CoverSection
@@ -159,7 +159,7 @@ function InvitationContent() {
       {/* 2. MAIN CONTENT */}
       <div id="main-invitation" className="min-h-screen relative">
         <div className="flex flex-col lg:flex-row min-h-screen">
-          
+
           {/* ======================================================== */}
           {/* PANEL KIRI (Desktop): Sticky Hero Cover Photo            */}
           {/* ======================================================== */}
@@ -171,7 +171,7 @@ function InvitationContent() {
               className="w-full h-full object-cover object-center animate-slow-zoom"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            
+
             <div className="absolute bottom-12 left-12 right-12 text-white space-y-3 z-10">
               <p className="text-xs uppercase tracking-[0.35em] text-[#c9a96e]">
                 The Wedding Of
@@ -216,10 +216,10 @@ function InvitationContent() {
             />
 
             {/* Event Section */}
-            <EventSection 
+            <EventSection
               photoAkad={data.photos.akad}
               photoResepsi={data.photos.resepsi}
-              events={data.events} 
+              events={data.events}
             />
 
             <DressCodeSection settings={data.dressCode} />
@@ -228,9 +228,9 @@ function InvitationContent() {
             <GallerySection gallery={data.photos.gallery} coverPhoto={data.photos.galleryCover} videoUrl={data.sections?.galleryVideo} title={data.sections?.galleryTitle} />
 
             {/* Love Story Section */}
-            <StorySection 
+            <StorySection
               title={data.sections?.storyTitle}
-              story={data.story} 
+              story={data.story}
             />
 
 
