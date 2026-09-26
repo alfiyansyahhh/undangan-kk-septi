@@ -188,7 +188,7 @@ function InvitationContent() {
           {/* ======================================================== */}
           {/* PANEL KANAN: Scrollable Sections                         */}
           {/* ======================================================== */}
-          <div className="w-full overflow-x-hidden lg:w-5/12 xl:w-1/3 min-h-screen  pb-24 border-l border-white/10 shadow-2xl">
+          <div className="w-full overflow-x-hidden lg:w-5/12 xl:w-1/3 min-h-screen  pb-24  shadow-2xl">
             <HeroSection
               // coverUrl={coverUrl}
               // coverPhotos={data?.photos?.gallery}
