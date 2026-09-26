@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import MusicEditor from "./musicEditor";
 import ShareEditor from "./shareEditor";
+import CheckInEditor from "./checkInEditor";
+import { calendarSchedule } from "@/lib/calendar";
 import WishesEditor from "@/app/components/admin/wishesEditor";
 import SectionEditor from "@/app/components/admin/sectionEditor";
 import {
@@ -22,7 +24,7 @@ export default function AdminPage() {
   const [localReport, setLocalReport] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
-  const [activeTab, setActiveTab] = useState<"photos" | "info" | "sections" | "wishes" | "share" | "music">("photos");
+  const [activeTab, setActiveTab] = useState<"photos" | "info" | "sections" | "wishes" | "share" | "music" | "checkin">("photos");
   const [customLinkInput, setCustomLinkInput] = useState("");
 
   // Load initial data
@@ -440,6 +442,8 @@ export default function AdminPage() {
         <button type="button" onClick={() => setActiveTab("wishes")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">Buku Tamu</button>
         <button type="button" onClick={() => setActiveTab("share")} className="mb-6 ml-3 rounded-lg bg-emerald-700 px-5 py-3 text-sm font-semibold text-white">Bagikan Undangan</button>
         <button type="button" onClick={() => setActiveTab("music")} className="mb-6 ml-3 rounded-lg border bg-white px-5 py-3 text-sm font-semibold">♫ Lagu</button>
+        <button type="button" onClick={() => setActiveTab("checkin")} className="mb-6 ml-3 rounded-lg bg-emerald-800 px-5 py-3 text-sm font-semibold text-white">QR Check-in</button>
+        {activeTab === "checkin" && <CheckInEditor />}
         {activeTab === "music" && <MusicEditor data={data} onChange={setData} />}
         {activeTab === "share" && <ShareEditor data={data} onChange={setData} />}
         {activeTab === "wishes" && <WishesEditor />}
@@ -1150,6 +1154,10 @@ export default function AdminPage() {
               </div>
             </section>
 
+            <div className="rounded-xl border bg-white p-4 text-sm space-y-2">
+              <p>Kalender memakai tanggal dan jam masing-masing acara. Gunakan tanggal seperti 18 Agustus 2026 dan jam 08:00 - 10:00 WIB (atau WITA/WIT), termasuk jam selesai.</p>
+              {(["akad", "resepsi"] as const).map(key => <p key={key} className={calendarSchedule(data.events[key]) ? "text-emerald-700" : "text-amber-800"}>{data.events[key].title}: {calendarSchedule(data.events[key]) ? "tombol kalender siap ditampilkan." : "tombol kalender belum tampil; lengkapi tanggal dan rentang jam."}</p>)}
+            </div>
             {/* Jadwal Acara */}
             <section className="bg-white p-5 rounded-xl border border-stone-200 shadow-xs">
               <h2 className="font-bold text-stone-900 text-base mb-4 flex items-center gap-2">

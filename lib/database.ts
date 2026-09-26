@@ -22,6 +22,7 @@ const schema = [
   "CREATE TABLE IF NOT EXISTS photos (id TEXT PRIMARY KEY, value TEXT NOT NULL)",
   "CREATE TABLE IF NOT EXISTS wishes (id TEXT PRIMARY KEY, value TEXT NOT NULL, created_at TEXT NOT NULL)",
   "CREATE TABLE IF NOT EXISTS guests (token TEXT PRIMARY KEY, name TEXT NOT NULL, phone TEXT NOT NULL, UNIQUE(name, phone))",
+  "CREATE TABLE IF NOT EXISTS check_ins (guest_token TEXT PRIMARY KEY REFERENCES guests(token), checked_in_at TEXT NOT NULL, party_size INTEGER NOT NULL CHECK(party_size BETWEEN 1 AND 100))",
   "CREATE TABLE IF NOT EXISTS admin_sessions (token TEXT PRIMARY KEY, expires INTEGER NOT NULL, version TEXT NOT NULL)",
   "CREATE TABLE IF NOT EXISTS login_attempts (id INTEGER PRIMARY KEY, count INTEGER NOT NULL, reset_at INTEGER NOT NULL)",
   "CREATE TABLE IF NOT EXISTS local_photos (id TEXT PRIMARY KEY, mime TEXT NOT NULL, content BLOB NOT NULL)",

@@ -9,7 +9,7 @@ const authToken=process.env.undangan_TURSO_AUTH_TOKEN || process.env.TURSO_AUTH_
 if(!url || !authToken)throw new Error('Konfigurasi Turso belum lengkap');
 const local=new DatabaseSync(source,{readOnly:true});
 const remote=createClient({url,authToken});
-const tables=['documents','photos','wishes','guests','local_photos'];
+const tables=['documents','photos','wishes','guests','check_ins','local_photos'];
 try {
   mkdirSync('storage/backups',{recursive:true});
   await backup(local,`storage/backups/pre-turso-${Date.now()}.sqlite`);

@@ -2,6 +2,7 @@
 
 import { revealMotion } from "./revealMotion";
 import { motion } from "framer-motion";
+import CalendarButtons from "./calendarButtons";
 
 import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
 
@@ -145,6 +146,7 @@ export default function EventSection({
             </div>
           </div>
         </motion.div>
+        <CalendarButtons events={events} />
       </div>
     </section>
   );

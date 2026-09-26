@@ -79,23 +79,24 @@ export default function WishSection({
           />
         </div>
 
-        <div>
-          <label htmlFor="wish-attendance" className="mb-2 block text-[10px] font-medium uppercase tracking-[0.16em] text-[#d1bd97]">Konfirmasi Kehadiran</label>
-          <select
-            id="wish-attendance"            value={wishForm.attendance}
-            onChange={(e) =>
-              setWishForm({
-                ...wishForm,
-                attendance: e.target.value as "Hadir" | "Tidak Hadir" | "Ragu-ragu",
-              })
-            }
-            className="w-full rounded-none border-0 border-b border-[#c9a96e]/25 bg-transparent px-0 py-3 font-sans text-base text-stone-100 transition-colors focus:border-[#ddc08a] focus:outline-none focus:ring-0 sm:text-sm"
-          >
-            <option className="bg-[#171512]" value="Hadir">Saya akan Hadir</option>
-            <option className="bg-[#171512]" value="Tidak Hadir">Maaf, Tidak Bisa Hadir</option>
-            <option className="bg-[#171512]" value="Ragu-ragu">Masih Ragu-ragu</option>
-          </select>
-        </div>
+        <fieldset>
+          <legend className="mb-3 block text-[10px] font-medium uppercase tracking-[0.16em] text-[#d1bd97]">Konfirmasi Kehadiran</legend>
+          <div className="grid gap-2">
+            {([
+              ["Hadir", "Saya akan hadir"],
+              ["Tidak Hadir", "Maaf, tidak bisa hadir"],
+              ["Ragu-ragu", "Masih ragu-ragu"],
+            ] as const).map(([value, label]) => (
+              <label key={value} className="relative cursor-pointer">
+                <input type="radio" name="attendance" value={value} checked={wishForm.attendance === value} onChange={() => setWishForm({ ...wishForm, attendance: value })} className="peer sr-only" />
+                <span className="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-black/15 px-4 py-3 text-sm text-stone-400 transition-colors hover:border-[#c9a96e]/40 peer-checked:border-[#c9a96e]/60 peer-checked:bg-[#c9a96e]/10 peer-checked:text-[#eee0c6] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[#ddc08a]">
+                  <span aria-hidden="true" className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${wishForm.attendance === value ? "border-[#c9a96e]" : "border-stone-600"}`}>{wishForm.attendance === value && <span className="h-2 w-2 rounded-full bg-[#c9a96e]" />}</span>
+                  {label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         <div>
           <label htmlFor="wish-message" className="mb-2 block text-[10px] font-medium uppercase tracking-[0.16em] text-[#d1bd97]">Pesan / Doa Restu</label>

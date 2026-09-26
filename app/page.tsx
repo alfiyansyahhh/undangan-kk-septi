@@ -2,6 +2,7 @@
 import PhotoLightbox from "./components/home/photoLightbox";
 import ClosingPhotoSection from "./components/home/closingPhotoSection";
 import DressCodeSection from "./components/home/dressCodeSection";
+import GuestQr from "./components/home/guestQr";
 
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
@@ -147,7 +148,7 @@ function InvitationContent() {
 
       {/* 1. COVER SCREEN */}
       <CoverSection
-        isOpen={isOpen}
+        isOpen={true}
         coverPhotos={slideshowPhotos}
         brideShortName={data.couple.bride.shortName}
         groomShortName={data.couple.groom.shortName}
@@ -223,6 +224,9 @@ function InvitationContent() {
             />
 
             <DressCodeSection settings={data.dressCode} />
+            {/* {verifiedName &&  */}
+            <GuestQr key={guestToken} token={guestToken} name={verifiedName} />
+            {/* } */}
 
             {/* Gallery Grid Masonry */}
             <GallerySection gallery={data.photos.gallery} coverPhoto={data.photos.galleryCover} videoUrl={data.sections?.galleryVideo} title={data.sections?.galleryTitle} />
