@@ -61,18 +61,18 @@ export default function StorySection({
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className={`p-5 rounded-2xl bg-black/40 backdrop-blur-md border border-white/10 flex items-center gap-4 shadow-xl ${
-                isEven ? "flex-row" : "flex-row-reverse"
+              className={`flex flex-col gap-4 rounded-2xl border border-white/10 bg-black/40 p-4 shadow-xl backdrop-blur-md sm:items-center sm:p-5 ${
+                isEven ? "sm:flex-row" : "sm:flex-row-reverse"
               }`}
             >
               {/* Foto Item */}
               {imgUrl ? (
-                <div className="w-2/5 flex-shrink-0 aspect-[3/4] rounded-xl overflow-hidden relative shadow-md bg-stone-800">
+                <div className="aspect-[4/3] w-full flex-shrink-0 overflow-hidden rounded-xl bg-stone-800 shadow-md sm:aspect-[3/4] sm:w-2/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={imgUrl}
                     alt={item.title || `Journey ${item.year}`}
-                    className="w-full h-full object-cover object-center"
+                    className="h-full w-full object-cover object-center"
                     onError={(e) => {
                       // Sembunyikan gambar jika gagal dimuat
                       (e.target as HTMLElement).style.display = "none";
@@ -87,12 +87,12 @@ export default function StorySection({
                   isEven ? "text-left" : "text-right"
                 }`}
               >
-                <h3 className="font-serif text-base sm:text-lg text-white font-medium">
+                <h3 className="font-serif text-base font-medium text-white sm:text-lg">
                   {item.title || item.year}
                 </h3>
                 <p className="text-[10px] tracking-widest text-stone-400">{item.year}</p>
-                <div className="text-xs text-stone-300 font-serif leading-relaxed  font-light">
-                  {item.desc}
+                <div className="text-xs font-light leading-relaxed text-stone-300 font-serif">
+                  {cleanStoryText(item.desc)}
                 </div>
               </div>
             </motion.div>
