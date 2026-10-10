@@ -18,14 +18,19 @@ export default function StorySection({
   // Helper untuk mendapatkan URL gambar yang valid
   const getImageUrl = (rawSrc?: string) => {
     if (!rawSrc) return "";
-    
+
     // Jika sudah berupa URL lengkap (http/https)
     if (rawSrc.startsWith("http://") || rawSrc.startsWith("https://")) {
       return rawSrc;
     }
-    
+
     // Jika berupa ID Google Drive
     return getDriveThumbnailUrl(rawSrc, 800);
+  };
+
+  const cleanStoryText = (text?: string) => {
+    if (!text) return "";
+    return text.replace(/(?:\s*[\.]{3,}|\s*[…]+)\s*$/, "").trim();
   };
 
   return (
@@ -86,9 +91,9 @@ export default function StorySection({
                   {item.title || item.year}
                 </h3>
                 <p className="text-[10px] tracking-widest text-stone-400">{item.year}</p>
-                <p className="text-xs text-stone-300 font-serif leading-relaxed line-clamp-6 font-light">
+                <div className="text-xs text-stone-300 font-serif leading-relaxed  font-light">
                   {item.desc}
-                </p>
+                </div>
               </div>
             </motion.div>
           );

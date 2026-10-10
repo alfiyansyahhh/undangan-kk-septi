@@ -174,26 +174,26 @@ function InvitationContent() {
       />
 
       {/* 2. MAIN CONTENT */}
-      <div id="main-invitation" className="min-h-screen relative">
-        <div className="flex flex-col lg:flex-row min-h-screen">
+      <div id="main-invitation" className="relative min-h-screen lg:overflow-hidden">
+        <div className="flex min-h-screen flex-col lg:flex-row">
 
           {/* ======================================================== */}
           {/* PANEL KIRI (Desktop): Sticky Hero Cover Photo            */}
           {/* ======================================================== */}
-          <div className="hidden lg:block lg:w-7/12 xl:w-2/3 h-screen sticky top-0 overflow-hidden">
+          <div className="hidden lg:block lg:sticky lg:top-0 lg:h-screen lg:w-7/12 xl:w-2/3 lg:flex-shrink-0 lg:overflow-hidden">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={coverUrl}
               alt="Desktop Cover"
-              className="w-full h-full object-cover object-center animate-slow-zoom"
+              className="h-full w-full object-cover object-center animate-slow-zoom"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-            <div className="absolute bottom-12 left-12 right-12 text-white space-y-3 z-10">
+            <div className="absolute bottom-12 left-12 right-12 z-10 space-y-3 text-white">
               <p className="text-xs uppercase tracking-[0.35em] text-[#c9a96e]">
                 The Wedding Of
               </p>
-              <h1 className="font-serif text-5xl xl:text-6xl text-white leading-tight">
+              <h1 className="font-serif text-5xl leading-tight text-white xl:text-6xl">
                 {data.couple.bride.shortName} & {data.couple.groom.shortName}
               </h1>
               <p className="text-sm tracking-widest text-stone-300 font-light">
@@ -205,7 +205,7 @@ function InvitationContent() {
           {/* ======================================================== */}
           {/* PANEL KANAN: Scrollable Sections                         */}
           {/* ======================================================== */}
-          <div className="w-full overflow-x-hidden lg:w-5/12 xl:w-1/3 min-h-screen  pb-24  shadow-2xl">
+          <div className="w-full overflow-x-hidden pb-24 shadow-2xl lg:w-5/12 lg:flex-1 lg:max-h-screen lg:overflow-y-auto xl:w-1/3">
             <HeroSection
               // coverUrl={coverUrl}
               // coverPhotos={data?.photos?.gallery}
@@ -241,9 +241,9 @@ function InvitationContent() {
 
             <DressCodeSection settings={data.dressCode} />
             {/* {verifiedName &&  */}
-            <GuestQr key={guestToken} token={guestToken} name={verifiedName} />
+            {/* <GuestQr key={guestToken} token={guestToken} name={verifiedName} /> */}
             {/* } */}
-
+{/* https://youtube.com/shorts/ZfunNr8QBHQ?si=ADeZRPj7H_RLBp9r */}
             {/* Gallery Grid Masonry */}
             <GallerySection gallery={data.photos.gallery} coverPhoto={data.photos.galleryCover} videoUrl={data.sections?.galleryVideo} title={data.sections?.galleryTitle} />
 
