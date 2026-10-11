@@ -1,15 +1,35 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { youtubeVideoId } from "@/lib/youtube";
 import MusicIcon from "./musicIcon";
-import YouTubeMusic from "./youtubeMusic";
+import YouTubeMusic, { type YouTubeMusicHandle } from "./youtubeMusic";
 import type { InvitationData } from "@/lib/gdrive";
-export default function MusicPlayer({music,isOpen}: {music:InvitationData["music"];isOpen:boolean}) {
+
+export interface MusicPlayerHandle {
+  playFromUserGesture(): void;
+}
+
+const MusicPlayer = forwardRef<MusicPlayerHandle, {music:InvitationData["music"];isOpen:boolean}>(
+function MusicPlayer({music,isOpen}, ref) {
   const audio = useRef<HTMLAudioElement>(null);
+  const youtubePlayer = useRef<YouTubeMusicHandle>(null);
   const [playing,setPlaying] = useState(false);
   const [error,setError] = useState("");
   const youtubeId = youtubeVideoId(music?.url || "");
   const enabled = !!music?.enabled && !!music.url;
+  useImperativeHandle(ref, () => ({
+    playFromUserGesture() {
+      if (!enabled) return;
+      if (youtubeId) {
+        youtubePlayer.current?.playFromUserGesture();
+        return;
+      }
+      const player = audio.current;
+      if (!player) return;
+      setError("");
+      void player.play().catch(() => setError("Lagu belum bisa diputar. Coba lagi."));
+    },
+  }), [enabled, youtubeId]);
   useEffect(()=> {
     const player = audio.current;
     if (!player) return;
@@ -46,7 +66,7 @@ export default function MusicPlayer({music,isOpen}: {music:InvitationData["music
     };
   }, [isOpen, enabled, music?.url, youtubeId]);
   if (!enabled) return null;
-  if (youtubeId) return isOpen ? <YouTubeMusic key={`${youtubeId}-${music!.loop}`} id={youtubeId} title={music!.title} loop={music!.loop} volume={music!.volume} /> : null;
+  if (youtubeId) return <YouTubeMusic ref={youtubePlayer} key={`${youtubeId}-${music!.loop}`} id={youtubeId} title={music!.title} loop={music!.loop} volume={music!.volume} isOpen={isOpen} />;
   async function toggle() {
     const player = audio.current;
     if (!player) return;
@@ -63,4 +83,8 @@ export default function MusicPlayer({music,isOpen}: {music:InvitationData["music
       {error && <p role="status" className="sr-only">{error}</p>}
     </div>}
   </>;
-}
+});
+
+MusicPlayer.displayName = "MusicPlayer";
+
+export default MusicPlayer;

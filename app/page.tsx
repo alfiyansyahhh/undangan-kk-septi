@@ -4,7 +4,7 @@ import ClosingPhotoSection from "./components/home/closingPhotoSection";
 import DressCodeSection from "./components/home/dressCodeSection";
 import GuestQr from "./components/home/guestQr";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
 
@@ -20,7 +20,7 @@ import GiftSection from "./components/home/giftSection";
 import WishSection, { Wish } from "./components/home/wishSection";
 import FooterSection from "./components/home/footerSection";
 import QuoteSliderSection from "./components/home/quoteSliderSection";
-import MusicPlayer from "./components/home/musicPlayer";
+import MusicPlayer, { type MusicPlayerHandle } from "./components/home/musicPlayer";
 import GlobalBackground from "./components/home/globalBackground";
 
 function InvitationContent() {
@@ -43,6 +43,7 @@ function InvitationContent() {
   const [data, setData] = useState<InvitationData | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const musicPlayer = useRef<MusicPlayerHandle>(null);
   const [copiedBank, setCopiedBank] = useState<string | null>(null);
   const [activeModalPhoto, setActiveModalPhoto] = useState<string | null>(null);
 
@@ -110,6 +111,7 @@ function InvitationContent() {
   }, [data?.events.targetDate]);
 
   const handleOpenInvitation = () => {
+    musicPlayer.current?.playFromUserGesture();
     setIsOpen(true);
     setTimeout(() => {
       document.getElementById("HeroSection-slider-section")?.scrollIntoView({ behavior: "smooth" });
@@ -159,7 +161,7 @@ function InvitationContent() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white relative font-sans">
 
-      <MusicPlayer music={data.music} isOpen={isOpen} />
+      <MusicPlayer ref={musicPlayer} music={data.music} isOpen={isOpen} />
       <GlobalBackground photos={slideshowPhotos} />
 
       {/* 1. COVER SCREEN */}

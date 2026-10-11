@@ -1,6 +1,6 @@
 "use client";
 import MusicIcon from "./musicIcon";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 interface Player {
   playVideo(): void; pauseVideo(): void; destroy(): void; setVolume(value:number): void;
 }
@@ -24,14 +24,26 @@ function loadAPI() {
   });
   return apiPromise;
 }
-export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {id:string;title:string;loop:boolean;volume?:number;preview?:boolean}) {
+export interface YouTubeMusicHandle {
+  playFromUserGesture(): void;
+}
+
+const YouTubeMusic = forwardRef<YouTubeMusicHandle, {id:string;title:string;loop:boolean;volume?:number;preview?:boolean;isOpen?:boolean}>(
+function YouTubeMusic({id,title,loop,volume=0.4,preview=false,isOpen=true}, ref) {
   const container=useRef<HTMLDivElement>(null);
   const player=useRef<Player | null>(null);
+  const isOpenRef=useRef(isOpen);
+  isOpenRef.current=isOpen;
   const [playing,setPlaying]=useState(false);
   const playingRef=useRef(false);
   const [ready,setReady]=useState(false);
   const [error,setError]=useState("");
   const volumeRef=useRef(volume);
+  useImperativeHandle(ref, () => ({
+    playFromUserGesture() {
+      player.current?.playVideo();
+    },
+  }), []);
   useEffect(()=>{volumeRef.current=volume;player.current?.setVolume(volume*100);},[volume]);
   useEffect(() => {
     let resumeOnReturn = false;
@@ -54,6 +66,9 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
       window.removeEventListener("pageshow", resume);
     };
   }, [id, loop, preview]);
+  useEffect(() => {
+    if (isOpen && ready && !preview && !document.hidden) player.current?.playVideo();
+  }, [isOpen, ready, preview]);
   useEffect(()=> {
     let cancelled=false;
     let instance:Player | undefined;
@@ -64,7 +79,7 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
         videoId:id,
         playerVars:{playsinline:1,controls:0,origin:window.location.origin,loop:loop?1:0,playlist:loop?id:""},
         events:{
-          onReady:({target})=>{if(cancelled)return;player.current=target;target.setVolume(volumeRef.current*100);setReady(true);if(!preview && !document.hidden)target.playVideo();},
+          onReady:({target})=>{if(cancelled)return;player.current=target;target.setVolume(volumeRef.current*100);setReady(true);if(!preview && isOpenRef.current && !document.hidden)target.playVideo();},
           onStateChange:({data})=>{if(cancelled)return;playingRef.current=data===1;if(data===1 && document.hidden){player.current?.pauseVideo();setPlaying(false);}else setPlaying(data===1);},
           onError:()=>{if(!cancelled){setPlaying(false);setError("Lagu YouTube tidak bisa diputar. Coba pilih lagu lain.");}},
           onAutoplayBlocked:()=>{if(!cancelled)setPlaying(false);},
@@ -76,7 +91,11 @@ export default function YouTubeMusic({id,title,loop,volume=0.4,preview=false}: {
   function toggle() { if(playing)player.current?.pauseVideo();else player.current?.playVideo(); }
   return <div className={preview?"text-stone-800 font-sans":"fixed bottom-5 right-5 z-40 max-w-[230px] text-white font-sans"}>
     <div ref={container} aria-hidden="true" inert className="pointer-events-none fixed -left-[10000px] top-0 h-[200px] w-[200px] opacity-0" />
-    <button type="button" disabled={!ready || !!error} onClick={toggle} aria-label={error || (!ready ? "Memuat musik" : playing ? "Jeda musik" : "Putar musik")} title={error || title || "Musik undangan"} aria-pressed={playing} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/80 text-white shadow-lg disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><MusicIcon playing={playing} /></button>
+    {(isOpen || preview) && <button type="button" disabled={!ready || !!error} onClick={toggle} aria-label={error || (!ready ? "Memuat musik" : playing ? "Jeda musik" : "Putar musik")} title={error || title || "Musik undangan"} aria-pressed={playing} className="flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/80 text-white shadow-lg disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><MusicIcon playing={playing} /></button>}
     {error && <p role="status" className={preview ? "mt-2 text-xs" : "sr-only"}>{error}</p>}
   </div>;
-}
+});
+
+YouTubeMusic.displayName = "YouTubeMusic";
+
+export default YouTubeMusic;

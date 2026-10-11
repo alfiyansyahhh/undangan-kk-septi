@@ -47,14 +47,14 @@ export default function GroomSection({
     <div className="text-center text-white relative z-10 overflow-hidden">
       <div className="max-w-md mx-auto space-y-6">
         {/* Title Animation */}
+ 
         <motion.h2
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           className="text-xs sm:text-sm uppercase tracking-[0.35em] text-stone-300 font-sans font-light"
         >
-          THE GROOM
+         THE GROOM
         </motion.h2>
 
         {/* Card Frame Foto Animation */}
