@@ -31,18 +31,18 @@ export default function QuoteSliderSection({
   return (
     <section id={id} className="py-16 px-6 bg-[#0a0a0a] border-t border-white/5 space-y-8 overflow-hidden">
       {/* Kutipan / Ayat Header */}
-      <motion.div {...revealMotion("fade", 0)} className="max-w-xl mx-auto space-y-6">
+      <div className="max-w-xl mx-auto space-y-6">
         <div className="flex items-center gap-4">
-          <h2 className="font-serif italic text-lg sm:text-2xl text-white font-medium whitespace-nowrap">
+          <motion.h2 {...revealMotion("left", 0)} className="font-serif italic text-lg sm:text-2xl text-white font-medium whitespace-nowrap">
             {quoteTitle}
-          </h2>
+          </motion.h2>
           <div className="h-[1px] w-full bg-gradient-to-r from-stone-500/50 to-transparent" />
         </div>
 
-        <p className="text-[11px] sm:text-sm text-stone-300 leading-relaxed font-light font-serif tracking-wide text-justify sm:text-left">
+        <motion.p {...revealMotion("text", 0.15)} className="text-[11px] sm:text-sm text-stone-300 leading-relaxed font-light font-serif tracking-wide text-justify sm:text-left">
           {quoteText}
-        </p>
-      </motion.div>
+        </motion.p>
+      </div>
 
       {/* Infinite Auto-Scroll Slider */}
       <motion.div {...revealMotion("text", 0.1)} className="w-full relative py-4">
@@ -74,9 +74,12 @@ export default function QuoteSliderSection({
                 style={{ width: "auto" }}
                 className="!w-40 sm:!w-52 flex-shrink-0"
               >
-                <div
+                <button
+                  type="button"
                   onClick={() => onSelectPhoto && onSelectPhoto(fullUrl)}
-                  className="w-40 h-60 sm:w-52 sm:h-72 rounded-sm overflow-hidden bg-[#1a1a1a] cursor-pointer group border border-[#c9a96e]/15 relative"
+                  aria-label={`Lihat foto slider ${idx + 1}`}
+                  disabled={!onSelectPhoto}
+                  className="group relative h-60 w-40 cursor-pointer overflow-hidden rounded-sm border border-[#c9a96e]/15 bg-[#1a1a1a] text-left disabled:cursor-default sm:h-72 sm:w-52"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -86,7 +89,7 @@ export default function QuoteSliderSection({
                     loading="lazy"
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all duration-500" />
-                </div>
+                </button>
               </SwiperSlide>
             );
           })}

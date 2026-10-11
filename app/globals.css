@@ -29,6 +29,18 @@ body {
   font-family: var(--font-cormorant), "Cormorant Garamond", Georgia, serif;
 }
 
+html,
+body,
+body * {
+  cursor: url("/cursor-luxury.svg") 18 18, pointer;
+}
+
+input,
+textarea,
+[contenteditable="true"] {
+  cursor: text;
+}
+
 /* Fade in animation */
 @keyframes fadeInUp {
   from {
