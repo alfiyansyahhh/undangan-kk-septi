@@ -12,3 +12,12 @@ export async function addGuests(guests:Array<{name:string;phone:string}>) {
   await database().batch(guests.map(guest=>({sql:"INSERT OR IGNORE INTO guests VALUES (?, ?, ?)",args:[randomBytes(24).toString("hex"),guest.name,guest.phone]})));
   return listGuests();
 }
+export async function removeGuest(token:string):Promise<boolean> {
+  const db=database();
+  if(!await db.prepare("SELECT token FROM guests WHERE token = ?").get(token))return false;
+  await db.batch([
+    {sql:"DELETE FROM check_ins WHERE guest_token = ?",args:[token]},
+    {sql:"DELETE FROM guests WHERE token = ?",args:[token]},
+  ]);
+  return true;
+}

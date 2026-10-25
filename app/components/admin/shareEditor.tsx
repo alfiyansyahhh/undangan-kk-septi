@@ -10,6 +10,7 @@ export default function ShareEditor({ data, onChange }: { data: InvitationData; 
   const [notice, setNotice] = useState("");
   const [guests, setGuests] = useState<Array<{name:string;phone:string;token:string}>>([]);
   const [busy, setBusy] = useState(false);
+  const [deleting, setDeleting] = useState<string | null>(null);
   useEffect(() => {
     fetch("/api/guests").then(async res => { if (!res.ok) throw new Error(); setGuests(await res.json()); }).catch(() => setNotice("Gagal memuat daftar tamu. Silakan login ulang atau muat ulang."));
   }, []);
@@ -22,6 +23,18 @@ export default function ShareEditor({ data, onChange }: { data: InvitationData; 
       setGuests(result); setNames(""); setNotice("Link tamu berhasil disimpan. Nama RSVP terkunci sesuai link.");
     } catch (error) { setNotice(error instanceof Error ? error.message : "Gagal membuat link tamu."); }
     finally { setBusy(false); }
+  }
+  async function removeGuest(token: string, name: string) {
+    if (!window.confirm(`Hapus undangan untuk ${name}? Link tamu dan data check-in-nya juga akan dihapus.`)) return;
+    setDeleting(token); setNotice("");
+    try {
+      const res = await fetch("/api/guests", {method:"DELETE",headers:{"Content-Type":"application/json"},body:JSON.stringify({token})});
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Gagal menghapus undangan.");
+      setGuests(current => current.filter(guest => guest.token !== token));
+      setNotice("Undangan tamu berhasil dihapus.");
+    } catch (error) { setNotice(error instanceof Error ? error.message : "Gagal menghapus undangan."); }
+    finally { setDeleting(null); }
   }
   const template = data.sections?.shareTemplate || defaultShareTemplate;
   const rows = guests.map(({name,phone,token}) => {
@@ -47,7 +60,7 @@ export default function ShareEditor({ data, onChange }: { data: InvitationData; 
     <button type="button" disabled={busy || !names.trim()} onClick={generate} className="rounded-lg bg-amber-700 px-4 py-3 text-white disabled:opacity-50">{busy ? "Membuat…" : "Simpan tamu & buat link"}</button>
     {notice && <p role="status" className="text-sm text-amber-800">{notice}</p>}
     {!!rows.length && <><div className="flex items-center justify-between gap-3"><strong>{rows.length} tamu</strong><button type="button" disabled={rows.some(row => !row.link)} onClick={() => copy(rows.map(row => `${row.name}\t${row.link}`).join("\n"))} className="rounded border px-3 py-2 text-sm">Salin semua nama &amp; link</button></div>
-    <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-stone-50"><tr><th className="p-3 text-left">Nama tamu</th><th className="p-3 text-left">Link personal</th><th className="p-3 text-left">Bagikan</th></tr></thead><tbody>{rows.map(row => <tr key={row.token} className="border-t"><td className="p-3">{row.name}{row.phone && <p className="text-xs text-stone-500">{row.phone}</p>}</td><td className="p-3 max-w-xs break-all">{row.link ? <a href={row.link} target="_blank" rel="noopener noreferrer" className="text-amber-800 underline">{row.link}</a> : <span className="text-red-700">Alamat website tidak valid</span>}</td><td className="p-3"><div className="flex flex-wrap gap-2"><button type="button" disabled={!row.link} onClick={() => copy(row.link)} className="rounded border px-3 py-2">Salin link</button><button type="button" disabled={!row.link} onClick={() => copy(row.message)} className="rounded border px-3 py-2">Salin pesan</button>{row.link && (!row.phone || row.number) && <a href={row.whatsapp} target="_blank" rel="noopener noreferrer" className="rounded bg-emerald-700 px-3 py-2 text-white">WhatsApp</a>}{row.phone && !row.number && <span className="text-xs text-red-700">Nomor tidak valid</span>}</div></td></tr>)}</tbody></table></div>
+    <div className="overflow-x-auto"><table className="w-full text-sm"><thead className="bg-stone-50"><tr><th className="p-3 text-left">Nama tamu</th><th className="p-3 text-left">Link personal</th><th className="p-3 text-left">Bagikan</th><th className="p-3 text-left">Kelola</th></tr></thead><tbody>{rows.map(row => <tr key={row.token} className="border-t"><td className="p-3">{row.name}{row.phone && <p className="text-xs text-stone-500">{row.phone}</p>}</td><td className="p-3 max-w-xs break-all">{row.link ? <a href={row.link} target="_blank" rel="noopener noreferrer" className="text-amber-800 underline">{row.link}</a> : <span className="text-red-700">Alamat website tidak valid</span>}</td><td className="p-3"><div className="flex flex-wrap gap-2"><button type="button" disabled={!row.link} onClick={() => copy(row.link)} className="rounded border px-3 py-2">Salin link</button><button type="button" disabled={!row.link} onClick={() => copy(row.message)} className="rounded border px-3 py-2">Salin pesan</button>{row.link && (!row.phone || row.number) && <a href={row.whatsapp} target="_blank" rel="noopener noreferrer" className="rounded bg-emerald-700 px-3 py-2 text-white">WhatsApp</a>}{row.phone && !row.number && <span className="text-xs text-red-700">Nomor tidak valid</span>}</div></td><td className="p-3"><button type="button" disabled={deleting !== null} onClick={() => removeGuest(row.token, row.name)} className="rounded border border-red-200 px-3 py-2 text-red-700 disabled:opacity-50">{deleting === row.token ? "Menghapus…" : "Hapus"}</button></td></tr>)}</tbody></table></div>
     <details className="rounded border p-3" open><summary className="cursor-pointer text-sm font-medium">Preview pesan: {rows[0].name}</summary><pre className="mt-3 whitespace-pre-wrap break-words font-sans text-sm">{rows[0].message}</pre></details></>}
   </section>;
 }
