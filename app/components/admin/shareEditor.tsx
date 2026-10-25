@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState, useSyncExternalStore } from "react";
-import type { InvitationData } from "@/lib/gdrive";
+import { coupleDisplayName, type InvitationData } from "@/lib/gdrive";
 import { defaultShareTemplate, guestMessage, invitationLink, whatsappPhone } from "@/lib/share";
 const subscribe = () => () => {};
 export default function ShareEditor({ data, onChange }: { data: InvitationData; onChange: (data: InvitationData) => void }) {
@@ -27,7 +27,7 @@ export default function ShareEditor({ data, onChange }: { data: InvitationData; 
   const rows = guests.map(({name,phone,token}) => {
     let link = "";
     try { link = invitationLink(base || origin, token); } catch { /* Show URL validation below. */ }
-    const message = guestMessage(template, { nama:name, mempelai:`${data.couple.bride.shortName} & ${data.couple.groom.shortName}`, tanggal:data.events.displayDate, link });
+    const message = guestMessage(template, { nama:name, mempelai:coupleDisplayName(data.couple), tanggal:data.events.displayDate, link });
     const number = whatsappPhone(phone);
     return { token, name, phone, number, link, message, whatsapp:`https://wa.me/${number}?text=${encodeURIComponent(message)}` };
   }).filter(row => row.name);

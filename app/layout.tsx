@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Cinzel_Decorative, Cormorant_Garamond } from "next/font/google";
 import { readInvitation } from "@/lib/database";
+import { coupleDisplayName, getDriveThumbnailUrl } from "@/lib/gdrive";
 import "./globals.css";
 
 export const runtime = "nodejs";
@@ -31,9 +32,10 @@ const cormorant = Cormorant_Garamond({
 
 export async function generateMetadata(): Promise<Metadata> {
   const invitation = await readInvitation();
-  const { bride, groom } = invitation.couple;
   const title = invitation.couple.title;
-  const description = `Undangan pernikahan ${bride.shortName} & ${groom.shortName} — ${invitation.events.displayDate}. Buka undangan untuk melihat detail acara.`;
+  const coupleName = coupleDisplayName(invitation.couple);
+  const description = `Undangan pernikahan ${coupleName} — ${invitation.events.displayDate}. Buka undangan untuk melihat detail acara.`;
+  const coverImage = getDriveThumbnailUrl(invitation.photos.cover, 1200);
 
   return {
     title,
@@ -46,20 +48,16 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       url: "/",
-      images: [
-        {
-          url: "/opengraph-image",
-          width: 1200,
-          height: 630,
-          alt: `Undangan pernikahan ${bride.shortName} & ${groom.shortName}`,
-        },
-      ],
+      images: [{
+        url: coverImage || "/icon.png",
+        alt: `Foto cover undangan pernikahan ${coupleName}`,
+      }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/opengraph-image"],
+      images: [coverImage || "/icon.png"],
     },
   };
 }

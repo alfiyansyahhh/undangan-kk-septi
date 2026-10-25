@@ -26,7 +26,7 @@ export default function FooterSection({
         </motion.p>
         <div className="gold-divider w-16 mx-auto" />
         <motion.p {...revealMotion("fade", 0.1)} className="font-serif text-2xl sm:text-3xl tracking-wide text-white">
-          {brideShortName} & {groomShortName}
+          {groomShortName} & {brideShortName}
         </motion.p>
         <motion.p {...revealMotion("text", 0.2)} className="text-xs text-[#c9a96e] font-medium tracking-wider">
           {hashtag}

@@ -93,6 +93,10 @@ export interface InvitationData {
   }>;
 }
 
+export function coupleDisplayName(couple: InvitationData["couple"]): string {
+  return `${couple.groom.shortName} & ${couple.bride.shortName}`;
+}
+
 /**
  * Ekstraksi ID file Google Drive dari berbagai format URL atau ID mentah
  */

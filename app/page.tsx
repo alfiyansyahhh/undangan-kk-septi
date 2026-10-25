@@ -6,7 +6,7 @@ import GuestQr from "./components/home/guestQr";
 
 import { useState, useEffect, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
-import { InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
+import { coupleDisplayName, InvitationData, getDriveThumbnailUrl } from "@/lib/gdrive";
 
 // Import semua Section yang sudah dipisah
 import CoverSection from "./components/home/converSection";
@@ -196,7 +196,7 @@ function InvitationContent() {
                 The Wedding Of
               </p>
               <h1 className="font-serif text-5xl leading-tight text-white xl:text-6xl">
-                {data.couple.bride.shortName} & {data.couple.groom.shortName}
+                {coupleDisplayName(data.couple)}
               </h1>
               <p className="text-sm tracking-widest text-stone-300 font-light">
                 {data.events.displayDate}

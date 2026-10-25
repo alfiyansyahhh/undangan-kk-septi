@@ -1,4 +1,4 @@
-import type { InvitationData } from "./gdrive";
+import { coupleDisplayName, type InvitationData } from "./gdrive";
 
 const months = ["januari", "februari", "maret", "april", "mei", "juni", "juli", "agustus", "september", "oktober", "november", "desember"];
 const stamp = (date: Date) => date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
@@ -36,7 +36,7 @@ function fold(line: string) {
 export function calendarEvent(data: InvitationData, key: "akad" | "resepsi") {
   const event = data.events[key], schedule = calendarSchedule(event);
   if (!schedule) return null;
-  const title = `${event.title} — ${data.couple.bride.shortName} & ${data.couple.groom.shortName}`;
+  const title = `${event.title} — ${coupleDisplayName(data.couple)}`;
   const location = `${event.venue}, ${event.address}`;
   const description = `${data.couple.title}\n${event.date}\n${event.time}\n${event.mapsUrl}`;
   const google = `https://calendar.google.com/calendar/render?${new URLSearchParams({ action: "TEMPLATE", text: title, dates: `${schedule.start}/${schedule.end}`, details: description, location })}`;
